@@ -1,15 +1,24 @@
 var movie = {
+  iterable: true,
   getList: function() {
     var movies = [
       {
-        id: 0,
-        realName: 'Asu mare 2',
-        similars: ['asu', 'mare', '2', 'asumare2']
+        id: 'm1',
+        realName: 'Tomorrowland',
+        similars: ['tomorrowland'],
+        type: 'movie'
       },
       {
-        id: 1,
-        realName: 'Decisión Mortal',
-        similars: ['decision', 'mortal', 'decisionmortal']
+        id: 'm2',
+        realName: 'Pitch Perfect 2',
+        similars: ['pitch', 'perfect', '2', 'pitchperfect2'],
+        type: 'movie'
+      },
+      {
+        id: 'm3',
+        realName: 'Mad Max: Fury Road',
+        similars: ['mad', 'max', 'fury', 'road'],
+        type: 'movie'
       }
     ];
     return movies;

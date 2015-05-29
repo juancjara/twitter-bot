@@ -12,6 +12,27 @@ function getField(tweet, path, def) {
   return field;
 }
 
+function dicToArray(dic) {
+  var arr = [];
+  for(var k in dic) {
+    arr.push(dic[k]);
+  }
+  return arr;
+}
+
+function groupArray(arr, groupBy, mix) {
+  var dic = {};
+  var id;
+  for(var i = 0, l = arr.length; i < l; i++) {
+    if (arr[i].rank < 0) continue;
+    id  = groupBy(arr[i]);
+    dic[id] = mix(dic[id], arr[i]);
+  }
+  return dicToArray(dic);
+}
+
 module.exports = {
-  getField: getField
+  groupArray: groupArray,
+  getField: getField,
+  dicToArray: dicToArray
 };

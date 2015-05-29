@@ -1,7 +1,7 @@
-var twitterLogic = require('./tweet/logic');
+var twitterHandler = require('./tweet/tweetHandler');
 var config = require('./config');
 
-twitterLogic.listenStream(config.hashtag);
+twitterHandler.listenStream(config.hashtag);
 
 console.log('twitter bot listening');
 

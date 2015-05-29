@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/juancjara/twitter-bot",
   "dependencies": {
+    "string-template": "^0.2.1",
     "twit": "^1.1.20"
   },
   "devDependencies": {
