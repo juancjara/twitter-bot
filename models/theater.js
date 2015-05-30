@@ -1,3 +1,5 @@
+var utils = require('../helpers/utils');
+
 var theater = {
   iterable: true,
   getList: function() {
@@ -16,6 +18,15 @@ var theater = {
       }
     ];
     return cinemas;
+  },
+  format: function(params) {
+    var cinema = {
+      id: params.id,
+      realName: params.name,
+      similars: utils.createSimilars(params.name),
+      type: 'cinema'
+    }
+    return cinema;
   },
   findOne: function(clue) {
     return 'Theater B';

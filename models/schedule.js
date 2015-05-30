@@ -3,32 +3,32 @@ var schedule = {
   getList: function() {
     var times = [
       {
-        movie: 0,
+        movie: 'm1',
         cinema: 0,
         times: '[3D] 12:15 3:00 5:45 8:30'
       },
       {
-        movie: 0,
+        movie: 'm1',
         cinema: 1,
         times: '12:15 3:00 5:45 8:30 [IMAX] 12:15 3:00 5:45 8:30'
       },
       {
-        movie: 1,
+        movie: 'm2',
         cinema: 0,
         times: '[IMAX] 12:15 3:00 5:45 8:30'
       },
       {
-        movie: 1,
+        movie: 'm2',
         cinema: 1,
         times: '12:15 3:00 5:45 8:30'
       },
       {
-        movie: 2,
+        movie: 'm3',
         cinema: 0,
         times: '[3D] 10.30'
       },
       {
-        movie: 2,
+        movie: 'm3',
         cinema: 1,
         times: '[IMAX] 12:15 3:00 3:30 4:00 5:00 5:30 5:45 6:00 6:30 7:30 8:00' +
                ' 8:30 9:30 10:20 [3D] 12:15 3:00 3:30 4:00 5:00 5:30 5:45 6:00 6:30 7:30 8:00' +

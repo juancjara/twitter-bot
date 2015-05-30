@@ -12,6 +12,22 @@ function getField(tweet, path, def) {
   return field;
 }
 
+function uniqueArray(arr, getId) {
+  var dic = {};
+  return arr.filter(function(item) {
+    var id = getId(item);
+    return dic.hasOwnProperty(id) ? false: (dic[id] = true); 
+  })
+}
+
+function createSimilars(text) {
+  var temp = text.replace(/[:\.',&]|( - )/g, '').toLowerCase().split(' ');
+  var similars = temp.filter(function(item) {
+    return item.length > 0;
+  });
+  return similars;
+}
+
 function dicToArray(dic) {
   var arr = [];
   for(var k in dic) {
@@ -31,8 +47,23 @@ function groupArray(arr, groupBy, mix) {
   return dicToArray(dic);
 }
 
+function argsToArray(args) {
+  return args = Array.prototype.slice.call(args);
+}
+
+function partial(fn) {
+  var pastArgs = argsToArray(arguments).slice(1);
+  return function() {
+    var newArgs = argsToArray(arguments);
+    return fn.apply(null, pastArgs.concat(newArgs));
+  }
+}
+
 module.exports = {
   groupArray: groupArray,
   getField: getField,
-  dicToArray: dicToArray
+  dicToArray: dicToArray,
+  createSimilars: createSimilars,
+  argsToArray: argsToArray,
+  partial: partial
 };
