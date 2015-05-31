@@ -1,5 +1,4 @@
 var schedule = {
-  iterable: false,
   getList: function() {
     var times = [
       {

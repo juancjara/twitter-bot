@@ -1,11 +1,10 @@
 var query = {
-  iterable: true,
   getList: function() {
     var words = [
       {
         id: 'q1',
         realName: 'schedule',
-        similars: ['schedule', 'program', 'time'],
+        simpleName: 'scheduleprogramtime',
         type: 'query'
       }
     ];

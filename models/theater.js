@@ -1,19 +1,18 @@
 var utils = require('../helpers/utils');
 
 var theater = {
-  iterable: true,
   getList: function() {
     var cinemas = [
       {
         id: 0,
         realName: 'AMC Empire 25',
-        similars: ['amc', 'empire', '25'],
+        simpleName: 'amcempire25',
         type: 'cinema'
       },
       {
         id: 1,
         realName: 'Alamo Drafthouse Littleton',
-        similars: ['alamo', 'drafthouse', 'littleton'],
+        simpleName: 'alamodrafthouselittleton',
         type: 'cinema'
       }
     ];
