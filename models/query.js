@@ -1,14 +1,14 @@
 var query = {
-  getList: function() {
+  getList: function(cb) {
     var words = [
       {
         id: 'q1',
-        realName: 'schedule',
-        simpleName: 'scheduleprogramtime',
+        realName: 'times',
+        simpleName: 'scheduleprogramtimes',
         type: 'query'
       }
     ];
-    return words;
+    return cb(null, words);
   }
 }
 

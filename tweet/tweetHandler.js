@@ -35,18 +35,18 @@ function createPosts(tweetInfo, response) {
 
   var longTemplate = '@{to} {post} ({times}) {timestamp}';
   spaceAvailable -= 5;
-  var elements = response.split(' ');
+  var times = response.split(' ');
   var actualPos = 0;
   var inititalPos;
   var times = 0;
   var posts = [];
 
-  while (actualPos < elements.length) {
+  while (actualPos < times.length) {
     times++;
     initialPos = actualPos;
-    actualPos += findLastFit(elements.slice(initialPos), spaceAvailable);
+    actualPos += findLastFit(times.slice(initialPos), spaceAvailable);
     fields.times = times;
-    fields.post = elements.slice(initialPos, actualPos).join(' ');
+    fields.post = times.slice(initialPos, actualPos).join(' ');
     posts.push(format(longTemplate, fields));
   }
   return posts;
@@ -54,11 +54,12 @@ function createPosts(tweetInfo, response) {
 
 function handleNewTweet(tweet) {
   console.log('------------------on tweet --------------------------');
-  var pt = parseTweet(tweet, ['id', 'name', 'screen_name', 'text', 'hashtags']);
+  var pt = parseFieldsFromTweet(tweet, ['id', 'name', 'screen_name', 'text', 'hashtags']);
   var text = pt.text.replace(/#\w+/i, '');
   var posts = createPosts(pt, queryTweet(text));
+
   posts.map(function(post) {
-    tweetPost(post);
+    postTweet(post);
   })
 }
 
@@ -67,7 +68,7 @@ function listenStream(hashtag) {
   stream.on('tweet',handleNewTweet);
 }
 
-function parseTweet(tweet, fields) {
+function parseFieldsFromTweet(tweet, fields) {
   var parsed = {};
   var mapFields = {
     id: 'id',
@@ -76,7 +77,8 @@ function parseTweet(tweet, fields) {
     text: 'text',
     hashtags: 'entities.hashtags'
   }
-  fields.map(function(k) {
+
+  fields.forEach(function(k) {
     if (k in mapFields) {
       parsed[k] = utils.getField(tweet, mapFields[k], 'none '+k);
     }
@@ -85,7 +87,7 @@ function parseTweet(tweet, fields) {
   return parsed;
 }
 
-function tweetPost(message) {
+function postTweet(message) {
   console.log('post', message); return;
   T.post('statuses/update', {status: message},
     function(err, data, response) {

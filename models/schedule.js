@@ -1,5 +1,5 @@
 var schedule = {
-  getList: function() {
+  getList: function(cb) {
     var times = [
       {
         movie: 'm1',
@@ -34,16 +34,17 @@ var schedule = {
                ' 8:30 9:00 9:15 9:30 10:00'
       },
     ]
-    return times;
+    return cb(null, times);
   },
   find: function(params) {
-    console.log(params);
     var times = schedule.getList();
+
     for( var i = 0, l = schedule.getList().length; i < l; i++) {
       if (times[i].movie === params.movie.id && 
           times[i].cinema === params.cinema.id)
         return times[i].times;
     }
+
     return null;
   }
 }

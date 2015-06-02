@@ -1,18 +1,17 @@
 //api movies
-
 var cheerio = require('cheerio');
 var request = require('request');
 
 var crawler = function() {
   var url = 'http://www.imdb.com/showtimes/';
-  function extract(cb) {
+  function crawl(cb) {
     request(url, function(err, res, html) {
       if (err) cb(err);
       cb(null, loadCheerio(html));
     })
   }
 
-  function extractSchedule($types) {
+  function extractShowTimes($types) {
     var schedule = '';
     $types.each(function() {
       var $schedule = $(this);
@@ -29,21 +28,24 @@ var crawler = function() {
   }
 
   function iterateMovies($movies) {
-    var movies = []
+    var movies = [];
+
     $movies.each(function() {
       var $movie = $(this);
       var movieName = $('h4', $movie).text().replace(/\(.*\)/g, '').trim();
       var $types = $('.li_group', $movie);
       movies.push({
         name: movieName,
-        schedule: extractSchedule($types)
+        schedule: extractShowTimes($types)
       });
     })
+
     return movies;
   }
 
   function iterateCinemas($cinemas) {
     var cinemas = [];
+
     $('#cinemas-at-list > .list_item').each(function() {
       var $cinema = $(this);
       var cinemaName = $cinema.children().first().text().trim();
@@ -53,6 +55,7 @@ var crawler = function() {
         movies: movies
       })
     })
+
     return cinemas;
   }
 
@@ -64,7 +67,7 @@ var crawler = function() {
   }
 
   return {
-    extract: extract
+    crawl: crawl
   }
 }();
 

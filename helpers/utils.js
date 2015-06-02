@@ -12,16 +12,24 @@ function getField(tweet, path, def) {
   return field;
 }
 
-function uniqueArray(arr, getId) {
+function cleanText(text) {
+  return removeCaracters(text).replace(/ /g, '');
+}
+
+function removeCaracters(text) {
+  return text.replace(/[:\.',&]|( - )/g, '').toLowerCase()
+}
+
+function uniqueArray(arr, getIdentifier) {
   var dic = {};
   return arr.filter(function(item) {
-    var id = getId(item);
+    var id = getIdentifier(item);
     return dic.hasOwnProperty(id) ? false: (dic[id] = true); 
   })
 }
 
 function createSimilars(text) {
-  var temp = text.replace(/[:\.',&]|( - )/g, '').toLowerCase().split(' ');
+  var temp = removeCaracters(text).split(' ');
   var similars = temp.filter(function(item) {
     return item.length > 0;
   });
@@ -65,5 +73,6 @@ module.exports = {
   dicToArray: dicToArray,
   createSimilars: createSimilars,
   argsToArray: argsToArray,
-  partial: partial
+  partial: partial,
+  cleanText: cleanText
 };

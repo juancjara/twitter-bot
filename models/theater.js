@@ -1,7 +1,7 @@
 var utils = require('../helpers/utils');
 
 var theater = {
-  getList: function() {
+  getList: function(cb) {
     var cinemas = [
       {
         id: 0,
@@ -16,14 +16,13 @@ var theater = {
         type: 'cinema'
       }
     ];
-    return cinemas;
+    return cb(null, cinemas);
   },
   format: function(params) {
     var cinema = {
-      id: params.id,
+      id: 'c' + params.id,
       realName: params.name,
-      similars: utils.createSimilars(params.name),
-      type: 'cinema'
+      simpleName: utils.cleanText(params.name)
     }
     return cinema;
   },
