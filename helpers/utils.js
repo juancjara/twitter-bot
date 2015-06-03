@@ -13,7 +13,7 @@ function getField(tweet, path, def) {
 }
 
 function cleanText(text) {
-  return removeCaracters(text).replace(/ /g, '');
+  return removeCaracters(text).replace(/  +/g, ' ');
 }
 
 function removeCaracters(text) {

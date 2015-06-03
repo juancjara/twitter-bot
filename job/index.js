@@ -1,51 +1,71 @@
 var mongoose = require('mongoose');
 var Q = require('q');
-var crawler = require('./crawler');
+var scraper = require('./scraper');
 var models = require('../models');
+var utils = require('../helpers/utils');
 
 mongoose.connect('mongodb://localhost/twitterbot');
 
-function bulkInsert(cinemas) {
-  /*var cinemasToInsert = cinemas.map(function(cinema, i) {
-    return models.theater.format({
-      name: cinema.name,
-      id: i
-    })
-  });*/
+function createTask(fn, obj) {
+  return fn(obj);
+}
 
-  var dicCinema = {};
+function getMovies(theaters) {
   var dicMovies = {};
-  var tasks = [];
-  //cinemas.forEach(function(cinema, i) {
-    
-    var cinema = cinemas[0];
-    dicCinema[cinema.name] = {name: cinema.name};
-    cinema.movies.forEach(function(movie) {
+
+  theaters.forEach(function(theater, i) {
+    theater.movies.forEach(function(movie) {
       if (!(movie.name in dicMovies)) {
         dicMovies[movie.name] = {name: movie.name};
-        tasks.push(models.movie.create(movie.name));
       }
     })
-  //})
-  console.log('pasts')
-  Q.all(tasks)
-    .then(function(results) {
-      console.log('ok', results);
-      results.forEach(function(res) {
-        console.log(res._id);
-      });
-    }, function(err) {
-      console.log('error', err);
-    })
+  })
 
-  console.log('here');
+  return utils.dicToArray(dicMovies);
+}
+
+function getSchedules(theaters) {
+  var times = [];
+
+  theaters.forEach(function(theater) {
+    theater.movies.forEach(function(movie) {
+      times.push({
+        movie: movie.name,
+        theater: theater.name,
+        schedule: movie.schedule
+      });
+    });
+  });
+
+  return times;
+}
+
+function saveAll(theaters) {
+  var theatersToSave = theaters
+                      .map(utils.partial(createTask, 
+                        models.theater.findOrCreate));
+
+  var moviesToSave = getMovies(theaters)
+                      .map(utils.partial(createTask, 
+                        models.movie.findOrCreate));
+                      
+  var toSave = theatersToSave.concat(moviesToSave);
+
+  Q.all(toSave).then(function(c) {
+      var scheduleToSave = getSchedules(theaters)
+                        .map(utils.partial(createTask, models.schedule.create));
+
+      Q.all(scheduleToSave).then(function(schedules) {
+        console.log('theaters and movies saved:', c.length)
+        console.log('schedules saved:', schedules.length);
+      });
+    })
 }
 
 function start() {
-  var data = crawler.extract(function(err, data) {
-    if (err) console.log('err', err);
-    //console.log('data', data);
-    bulkInsert(data);
+  var data = scraper.scrap(function(err, data) {
+    if (err) return console.log('err', err);
+    saveAll(data);
   });
 }
 

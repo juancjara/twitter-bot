@@ -2,9 +2,9 @@
 var cheerio = require('cheerio');
 var request = require('request');
 
-var crawler = function() {
+var scraper = function() {
   var url = 'http://www.imdb.com/showtimes/';
-  function crawl(cb) {
+  function scrap(cb) {
     request(url, function(err, res, html) {
       if (err) cb(err);
       cb(null, loadCheerio(html));
@@ -67,8 +67,8 @@ var crawler = function() {
   }
 
   return {
-    crawl: crawl
+    scrap: scrap
   }
 }();
 
-module.exports = crawler;
+module.exports = scraper;

@@ -1,34 +1,27 @@
 var utils = require('../helpers/utils');
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
-var theater = {
-  getList: function(cb) {
-    var cinemas = [
-      {
-        id: 0,
-        realName: 'AMC Empire 25',
-        simpleName: 'amcempire25',
-        type: 'cinema'
-      },
-      {
-        id: 1,
-        realName: 'Alamo Drafthouse Littleton',
-        simpleName: 'alamodrafthouselittleton',
-        type: 'cinema'
-      }
-    ];
-    return cb(null, cinemas);
-  },
-  format: function(params) {
-    var cinema = {
-      id: 'c' + params.id,
-      realName: params.name,
-      simpleName: utils.cleanText(params.name)
-    }
-    return cinema;
-  },
-  findOne: function(clue) {
-    return 'Theater B';
+var theaterSchema = new Schema({
+  realName: String,
+  simpleName: String,
+  created: { type: Date, default: Date.now }
+});
+
+function format(name) {
+  var cinema = {
+    realName: name,
+    simpleName: utils.cleanText(name)
   }
+  return cinema;
 }
 
-module.exports = theater;
+theaterSchema.statics.findOrCreate = function(params) {
+  var name = params.name;
+  return Theater.findOne({realName: name}, function(err, m) {
+    if (m) return m;
+    return new Theater(format(name)).save();
+  });
+}
+
+var Theater = module.exports = mongoose.model('Theater', theaterSchema);

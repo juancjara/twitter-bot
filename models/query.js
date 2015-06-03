@@ -2,9 +2,9 @@ var query = {
   getList: function(cb) {
     var words = [
       {
-        id: 'q1',
+        _id: 'q1',
         realName: 'times',
-        simpleName: 'scheduleprogramtimes',
+        simpleName: 'schedule program times',
         type: 'query'
       }
     ];
