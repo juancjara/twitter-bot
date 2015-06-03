@@ -49,7 +49,6 @@ function getType(text, item) {
   }
 }
 
-
 function getId(words, list) {
   return list.map(utils.partial(getType, words))
           .sort(sortDescByRank)[0]._id;
@@ -76,21 +75,23 @@ function getQuery(words) {
   return getTypeFromPromise(words, models.query);
 }
 
-function parseQueryFromTweet(text, cb) {
+function parseQueryFromTweet(text) {
   var tasks = [
     getMovie(text),
-    getCinema(text),
-    getQuery(text)
+    getCinema(text)/*,
+    getQuery(text)*/
   ];
 
-  Q.all(tasks)
-    .then(function(results) {
-      cb(null, {
-        movie: results[0],
-        cinema: results[1],
-        query: results[2]
-      });
-    },cb)
+  return Q.promise(function(resolve, reject) {
+    Q.all(tasks)
+      .then(function(results) {
+        resolve({
+          movie: results[0],
+          theater: results[1],
+          query: 'schedule'
+        });
+      },reject)    
+  })
 }
 
 module.exports = {
@@ -99,9 +100,3 @@ module.exports = {
   getCinema: getCinema,
   getQuery: getQuery
 }
-
-parseQueryFromTweet('pitch movie mad max alamo cinema schedule', function(err, gg){
-  console.log(gg);
-});
-
-//substack

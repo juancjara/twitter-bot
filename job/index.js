@@ -48,14 +48,15 @@ function saveAll(theaters) {
   var moviesToSave = getMovies(theaters)
                       .map(utils.partial(createTask, 
                         models.movie.findOrCreate));
-                      
+
   var toSave = theatersToSave.concat(moviesToSave);
 
   Q.all(toSave).then(function(c) {
       var scheduleToSave = getSchedules(theaters)
-                        .map(utils.partial(createTask, models.schedule.create));
+                          .map(utils.partial(createTask,
+                            models.schedule.create));
 
-      Q.all(scheduleToSave).then(function(schedules) {
+      return Q.all(scheduleToSave).then(function(schedules) {
         console.log('theaters and movies saved:', c.length)
         console.log('schedules saved:', schedules.length);
       });
@@ -68,5 +69,3 @@ function start() {
     saveAll(data);
   });
 }
-
-start();

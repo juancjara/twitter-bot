@@ -28,4 +28,33 @@ scheduleSchema.statics.create = function(params) {
   })
 }
 
+scheduleSchema.statics.getOne = function(params) {
+  var tasks = [
+    Movie.findById(params.movie),
+    Theater.findById(params.theater),
+  ];
+  var response = {
+    schedule: null,
+    movie: null,
+    theater: null
+  }
+
+  return Q.promise(function(resolve, reject) {
+    Q.spread(tasks, function(movie, theater) {
+      Schedule.findOne({
+        theater: params.theater,
+        movie: params.movie
+      },function(err, m) {
+        if (err) return reject(err);
+        var response = {
+          schedule: m ? m.times : '',
+          movie: movie.realName,
+          theater: theater.realName
+        }
+        return resolve(response);
+      })
+    })
+  })
+}
+
 var Schedule = module.exports = mongoose.model('Schedule', scheduleSchema);

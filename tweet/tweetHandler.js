@@ -7,10 +7,14 @@ var match = require('../helpers/match')
 
 var T = new Twit(config.twitter);
 
-function findLastFit(arr, spaceAvailable) {
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/twitterbot');
+
+function findNextIndexFit(arr, spaceAvailable) {
   var spaceUsed = arr[0].length;
   var index = 1;
   while (index < arr.length) {
+    //+1 because of space
     newSpace = arr[index].length + 1;
     if (spaceUsed + newSpace > spaceAvailable) break;
     spaceUsed += newSpace;
@@ -19,48 +23,85 @@ function findLastFit(arr, spaceAvailable) {
   return index;
 }
 
-function createPosts(tweetInfo, response) {
-  response = response || '';
+function shouldUseOneTweet(max, length) {
+  return getAvailableSpace(max, length) > 0
+}
+
+function getSpaceWithoutMsg(max, fields, template) {
+  fields.msg = '';
+  return getAvailableSpace(max, format(template, fields).length);
+}
+
+function getAvailableSpace(max, length) {
+  return max - length;
+}
+
+function generateLongTweets(maxSpace, fields) {
+    var tweets = [];
+    var times = fields.msg.split(' ');
+    var firstTweetTemplate = '@{to} movie:{movie} theater:{theater} -> {msg} ' +
+                             '({count}) {uniqueField}';
+
+    var spaceAvailable = getSpaceWithoutMsg(maxSpace, fields, firstTweetTemplate);
+    var last = findNextIndexFit(times, spaceAvailable);
+    fields.msg = times.slice(0, last).join(' ');
+    tweets.push(format(firstTweetTemplate, fields));
+
+    var initial;
+    var nextTweetsTemplate = '@{to} {msg} ({count}) {uniqueField}';
+    spaceAvailable = getSpaceWithoutMsg(maxSpace, fields, nextTweetsTemplate);
+    
+    while(last < times.length) {
+      fields.count++;
+      initial = last;
+      last += findNextIndexFit(times.slice(initial), spaceAvailable);
+      fields.msg = times.slice(initial, last).join(' ');
+      tweets.push(format(nextTweetsTemplate, fields));
+    }
+
+    return tweets;
+}
+
+function createPosts(to, queryInfo) {
   var fields = {
-    to: tweetInfo.screen_name,
-    timestamp: (new Date()).getMilliseconds() + '',
-    times: ''
-  };
-  var spaceAvailable = 140 - (fields.to.length + fields.timestamp.length + 2);
-  if (response.length < spaceAvailable) {
-    var shortTemplate = '@{to} {post} {timestamp}';
-    fields.post = response;
-    return [format(shortTemplate, fields)];
+    to: to,
+    msg: queryInfo.schedule,
+    count: 1,
+    movie: queryInfo.movie,
+    theater: queryInfo.theater,
+    uniqueField: '*' + (new Date()).getMilliseconds()
   }
 
-  var longTemplate = '@{to} {post} ({times}) {timestamp}';
-  spaceAvailable -= 5;
-  var times = response.split(' ');
-  var actualPos = 0;
-  var inititalPos;
-  var times = 0;
-  var posts = [];
+  var maxSpace = 140;
+  var tweets = [];
 
-  while (actualPos < times.length) {
-    times++;
-    initialPos = actualPos;
-    actualPos += findLastFit(times.slice(initialPos), spaceAvailable);
-    fields.times = times;
-    fields.post = times.slice(initialPos, actualPos).join(' ');
-    posts.push(format(longTemplate, fields));
+  var oneTweetTemplate = '@{to} movie:{movie} theater:{theater} -> {msg} {uniqueField}';
+  var oneTweet = format(oneTweetTemplate, fields);
+
+  if (shouldUseOneTweet(maxSpace, oneTweet.length)) {
+    tweets.push(oneTweet);
+  } else {
+    tweets = generateLongTweets(maxSpace, fields);
   }
-  return posts;
+  return tweets;
 }
 
 function handleNewTweet(tweet) {
   console.log('------------------on tweet --------------------------');
-  var pt = parseFieldsFromTweet(tweet, ['id', 'name', 'screen_name', 'text', 'hashtags']);
-  var text = pt.text.replace(/#\w+/i, '');
-  var posts = createPosts(pt, queryTweet(text));
+  var tweetFields = parseFieldsFromTweet(tweet, ['id', 'name', 'screen_name', 'text', 'hashtags']);
+  var msg = tweetFields.text.replace(/#\w+/i, '');
 
-  posts.map(function(post) {
-    postTweet(post);
-  })
+  match.parseQueryFromTweet(msg)
+    .then(models.schedule.getOne)
+    .then(function(data) { 
+      if(!data.schedule) {
+        data.schedule = 'No schedule found';
+      };
+      var posts = createPosts(tweetFields.screen_name, data);
+      posts.map(function(post) {
+        postTweet(post);
+      })
+    });
 }
 
 function listenStream(hashtag) {
@@ -98,14 +139,22 @@ function postTweet(message) {
 }
 
 function queryTweet(text) {
-  var queryFields = match.extractFields(text); 
-  return models.schedule.find(queryFields);
+  var queryFields = match.parseQueryFromTweet(text);
+  return models.schedule.getOne(queryFields);
 }
+
+/*
+gg('boterino', {
+  movie: 'ggwp',
+  theater: 'lol',
+  schedule: 'ASDF as as as a a sa a sa a as as a a s ASDF as as as a a sa a sa a as as a a s FFFF as as as a a sa a sa a as as a a s ASDF as as as a a sa 123sa a as as a a s ASDF as as as a a sa a sa a as as a a s ASDF as as as a a sa a sa a as as a a s'
+})
+*/
 
 handleNewTweet({ created_at: 'Thu May 28 20:52:28 +0000 2015',
   id: 604027482900152300,
   id_str: '604027482900152320',
-  text: '#ggwp123 movie pitch mad max on alamo drafthouse give me schedule',
+  text: '#ggwp123 mad max amc empire',
   source: '<a href="http://twitter.com" rel="nofollow">Twitter Web Client</a>',
   truncated: false,
   in_reply_to_status_id: null,

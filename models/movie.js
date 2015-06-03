@@ -11,27 +11,7 @@ var movieSchema = new Schema({
 });
 
 movieSchema.statics.getList = function getList(cb) {
-var movies = [
-  {
-    _id: 'm1',
-    realName: 'Tomorrowland',
-    simpleName: 'tomorrowland',
-    type: 'movie'
-  },
-  {
-    _id: 'm2',
-    realName: 'Pitch Perfect 2',
-    simpleName: 'pitch perfect 2',
-    type: 'movie'
-  },
-  {
-    _id: 'm3',
-    realName: 'Mad Max: Fury Road',
-    simpleName: 'mad max fury road',
-    type: 'movie'
-  }
-];
-cb(null, movies);
+  Movie.find(cb);
 };
 
 function format(name) {

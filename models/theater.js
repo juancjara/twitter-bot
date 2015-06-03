@@ -8,6 +8,10 @@ var theaterSchema = new Schema({
   created: { type: Date, default: Date.now }
 });
 
+theaterSchema.statics.getList = function getList(cb) {
+  Theater.find(cb);
+}
+
 function format(name) {
   var cinema = {
     realName: name,
@@ -25,3 +29,5 @@ theaterSchema.statics.findOrCreate = function(params) {
 }
 
 var Theater = module.exports = mongoose.model('Theater', theaterSchema);
+
+
