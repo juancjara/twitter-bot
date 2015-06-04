@@ -86,10 +86,14 @@ function createPosts(to, queryInfo) {
   return tweets;
 }
 
+function removeHashTag(text) {
+  return text.replace(/#\w+/i, '');
+}
+
 function handleNewTweet(tweet) {
   console.log('------------------on tweet --------------------------');
   var tweetFields = parseFieldsFromTweet(tweet, ['id', 'name', 'screen_name', 'text', 'hashtags']);
-  var msg = tweetFields.text.replace(/#\w+/i, '');
+  var msg = removeHashTag(tweetFields.text);
 
   match.parseQueryFromTweet(msg)
     .then(models.schedule.getOne)
@@ -98,7 +102,7 @@ function handleNewTweet(tweet) {
         data.schedule = 'No schedule found';
       };
       var posts = createPosts(tweetFields.screen_name, data);
-      posts.map(function(post) {
+      posts.forEach(function(post) {
         postTweet(post);
       })
     });

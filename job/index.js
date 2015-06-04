@@ -3,8 +3,9 @@ var Q = require('q');
 var scraper = require('./scraper');
 var models = require('../models');
 var utils = require('../helpers/utils');
+var config = require('../config');
 
-mongoose.connect('mongodb://localhost/twitterbot');
+mongoose.connect(config.mongoConnection);
 
 function createTask(fn, obj) {
   return fn(obj);
