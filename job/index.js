@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Q = require('q');
+
 var scraper = require('./scraper');
 var models = require('../models');
 var utils = require('../helpers/utils');
@@ -43,30 +44,34 @@ function getSchedules(theaters) {
 
 function saveAll(theaters) {
   var theatersToSave = theaters
-                      .map(utils.partial(createTask, 
-                        models.theater.findOrCreate));
+    .map(utils.partial(createTask, 
+                       models.theater.findOrCreate));
 
   var moviesToSave = getMovies(theaters)
-                      .map(utils.partial(createTask, 
-                        models.movie.findOrCreate));
+    .map(utils.partial(createTask, 
+                       models.movie.findOrCreate));
 
   var toSave = theatersToSave.concat(moviesToSave);
 
-  Q.all(toSave).then(function(c) {
-      var scheduleToSave = getSchedules(theaters)
-                          .map(utils.partial(createTask,
-                            models.schedule.create));
+  Q.all(toSave)
+    .then(function(c) {
+      console.log('cinemas and movies updated or save', c.length);
 
-      return Q.all(scheduleToSave).then(function(schedules) {
-        console.log('theaters and movies saved:', c.length)
-        console.log('schedules saved:', schedules.length);
-      });
-    })
+      var scheduleToSave = getSchedules(theaters)
+        .map(utils.partial(createTask,
+                           models.schedule.create));
+
+      return Q.all(scheduleToSave);
+    }).then(function(schedules) {
+      console.log('schedules updated or save:', schedules.length);
+    });
 }
 
 function start() {
-  var data = scraper.scrap(function(err, data) {
+  var url = 'http://www.imdb.com/showtimes/';
+  var data = scraper.scrap(url, function(err, data) {
     if (err) return console.log('err', err);
+    console.log('scraper done');
     saveAll(data);
   });
 }

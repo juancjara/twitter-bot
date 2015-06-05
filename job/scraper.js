@@ -3,8 +3,7 @@ var cheerio = require('cheerio');
 var request = require('request');
 
 var scraper = function() {
-  var url = 'http://www.imdb.com/showtimes/';
-  function scrap(cb) {
+  function scrap(url , cb) {
     request(url, function(err, res, html) {
       if (err) cb(err);
       cb(null, loadCheerio(html));
