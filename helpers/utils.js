@@ -17,7 +17,7 @@ function cleanText(text) {
 }
 
 function removeCaracters(text) {
-  return text.replace(/[:\.',&]|( - )/g, '').toLowerCase()
+  return text.replace(/[:\.',&\\]|( - )/g, '').toLowerCase()
 }
 
 function uniqueArray(arr, getIdentifier) {

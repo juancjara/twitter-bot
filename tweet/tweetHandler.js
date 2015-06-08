@@ -1,4 +1,7 @@
+var Q = require('q');
+
 var Twit = require('twit');
+
 var models = require('../models');
 var utils = require('../helpers/utils');
 var config = require('../config');
@@ -30,6 +33,15 @@ function parseFieldsFromTweet(tweet, fields) {
   return parsed;
 }
 
+function getLocation(id) {
+  console.log(getLocation);
+  return Q.promise(function (resolve, reject) {
+    T.get('statuses/show/:id', {id: id}, function (err, data, response) {
+      console.log(err, id);
+      console.log(data);
+    });
+  });
+}
 
 function queryTweet(text) {
   var queryFields = match.parseQueryFromTweet(text);
@@ -53,6 +65,7 @@ function handleNewTweet(tweet) {
         postTweet(post);
       })
     });
+    
 }
 
 function listenStream(hashtag) {

@@ -67,11 +67,24 @@ function saveAll(theaters) {
     });
 }
 
+
+
+var zipCodes = [
+  '',
+  ''
+];
+
+//10001 10469 // my zip code rc 10013
+
 function start() {
-  var url = 'http://www.imdb.com/showtimes/';
+  var url = 'http://www.imdb.com/showtimes/US/10013';
   var data = scraper.scrap(url, function(err, data) {
     if (err) return console.log('err', err);
     console.log('scraper done');
     saveAll(data);
   });
 }
+
+start();
+
+//http://www.geoplugin.net/extras/postalcode.gp?lat=40.720633899999996&long=-74.00082119999999

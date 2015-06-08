@@ -44,14 +44,15 @@ function getType(text, item) {
   var length = item.simpleName.length;
   var lengthMatch = lcs(item.simpleName, text);
   return obj = {
-    rank: length - (length - lengthMatch),
-    _id: item._id
+    rank: (lengthMatch*100.0)/length,
+    _id: item._id,
+    name: item.realName
   }
 }
 
 function getId(words, list) {
   return list.map(utils.partial(getType, words))
-          .sort(sortDescByRank)[0]._id;
+          .sort(sortDescByRank)[0];
 }
 
 function getTypeFromPromise(words, model) {
@@ -76,6 +77,7 @@ function getQuery(words) {
 }
 
 function parseQueryFromTweet(text) {
+  text =  utils.cleanText(text);
   var tasks = [
     getMovie(text),
     getCinema(text)/*,

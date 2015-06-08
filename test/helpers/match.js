@@ -1,5 +1,4 @@
 var should = require('chai').should();
-
 var match = require('../../helpers/match');
 
 describe('match', function() {

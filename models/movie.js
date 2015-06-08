@@ -11,7 +11,7 @@ var movieSchema = new Schema({
 });
 
 movieSchema.statics.getList = function getList(cb) {
-  Movie.find(cb);
+   Movie.find(cb);
 };
 
 function format(name) {
