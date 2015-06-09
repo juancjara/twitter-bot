@@ -49,7 +49,7 @@ function getSpaceWithoutMsg(max, fields, template) {
   return max - format(template, fields).length;
 }
 
-module.exports = function createPosts(to, queryInfo) {
+function createPosts(to, queryInfo) {
   var fields = {
     to: to,
     msg: queryInfo.schedule,
@@ -72,4 +72,20 @@ module.exports = function createPosts(to, queryInfo) {
     tweets = generateLongTweets(maxSpace, fields);
   }
   return tweets;
+}
+
+function createHelpMsg(to) {
+  var fields = {
+    to: to,
+    msg: 'Hey, tweet movie and cinema to get the schedule',
+    uniqueField: '*' + (new Date()).getMilliseconds()
+  }
+
+  var template = '@{to} {msg} {uniqueField}';
+  return format(template, fields);
+}
+
+module.exports = {
+  createPosts: createPosts,
+  createHelpMsg: createHelpMsg
 }

@@ -6,7 +6,7 @@ var models = require('../models');
 var utils = require('../helpers/utils');
 var config = require('../config');
 var match = require('../helpers/match')
-var createPosts = require('./createPosts');
+var tweetBuilder = require('./tweetBuilder');
 
 var T = new Twit(config.twitter);
 
@@ -53,6 +53,14 @@ function handleNewTweet(tweet) {
   var tweetFields = parseFieldsFromTweet(tweet,
                      ['id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = removeHashTag(tweetFields.text);
+  var msgClean = utils.cleanSpaces(msg);
+  console.log('msgClean', msgClean);
+  if ( msgClean === 'help' || !msgClean.length ) {
+    var post = tweetBuilder.createHelpMsg(tweetFields.screen_name);
+
+    postTweet(post);
+    return;
+  }
 
   match.parseQueryFromTweet(msg)
     .then(models.schedule.getOne)

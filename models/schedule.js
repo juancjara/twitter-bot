@@ -57,4 +57,14 @@ scheduleSchema.statics.getOne = function(params) {
   })
 }
 
+scheduleSchema.statics.clear = function () {
+  return Q.promise(function (resolve, reject) {    
+    Schedule.remove({}, function(err){
+      if(err) rejected(err);
+      console.log('cleaned');
+      resolve();
+    });
+  });
+}
+
 var Schedule = module.exports = mongoose.model('Schedule', scheduleSchema);

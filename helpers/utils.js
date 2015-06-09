@@ -16,6 +16,10 @@ function cleanText(text) {
   return removeCaracters(text).replace(/  +/g, ' ');
 }
 
+function cleanSpaces(text) {
+  return text.replace(/ /g, '');
+}
+
 function removeCaracters(text) {
   return text.replace(/[:\.',&\\]|( - )/g, '').toLowerCase()
 }
@@ -74,5 +78,6 @@ module.exports = {
   createSimilars: createSimilars,
   argsToArray: argsToArray,
   partial: partial,
-  cleanText: cleanText
+  cleanText: cleanText,
+  cleanSpaces: cleanSpaces
 };
