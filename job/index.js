@@ -9,9 +9,10 @@ var doOnTick = function() {
 	console.log('updateDatabase');
 	updateDatabase.start();
 };
+
 var job = new CronJob({
   cronTime: time,
-  onTick: 
+  onTick: doOnTick
 })
 
 doOnTick();
