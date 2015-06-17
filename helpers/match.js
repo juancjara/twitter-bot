@@ -52,36 +52,61 @@ function getType(text, item) {
 
 function getId(words, list) {
   return list.map(utils.partial(getType, words))
-          .sort(sortDescByRank)[0];
+          .sort(sortDescByRank)[0]._id;
 }
 
-function getTypeFromPromise(words, model) {
+function getTypeFromPromise(text, model) {
   return Q.promise(function(resolve, reject) {
     model.getList(function(err, list) {
       if (err) return reject(err);
-      resolve(getId(words, list));
+      if (!list || !list.length) {
+        reject('no list found');
+      }
+      resolve(getId(text, list));
     })
   })
 } 
 
-function getMovie(words) {
-  return getTypeFromPromise(words, models.movie);
+function getMovieFromCinema(text,id) {
+  return Q.promise(function(resolve, reject) {
+    models.theater.getMovies(id, function(err, theater) {
+      if (err) return reject(err);
+      if (!theater.movies || !theater.movies.length) {
+        reject('no list found');
+      }
+      resolve(getId(text, theater.movies));
+    })    
+  })
 }
 
-function getCinema(words) {
-  return getTypeFromPromise(words, models.theater);
+function getMovie(text) {
+  return getTypeFromPromise(text, models.movie);
 }
 
-function getQuery(words) {
-  return getTypeFromPromise(words, models.query);
+function getCinema(text) {
+  return getTypeFromPromise(text, models.theater);
+}
+
+function getQuery(text) {
+  return getTypeFromPromise(text, models.query);
 }
 
 function parseQueryFromTweet(text) {
   text =  utils.cleanText(text);
-  var tasks = [
-    getMovie(text),
-    getCinema(text)/*,
-    getQuery(text)*/
+  return Q.promise(function(resolve, reject) {
+    getCinema(text).then(function(cinemaId) {
+      getMovieFromCinema(text, cinemaId)
+        .then(function(movieId) {
+          resolve({
+            movie: movieId,
+            theater: cinemaId
+        })
+      });;
+    })  
+  })
+  
+  /*var tasks = [
+    getCinema(text)
   ];
 
   return Q.promise(function(resolve, reject) {
@@ -93,9 +118,20 @@ function parseQueryFromTweet(text) {
           query: 'schedule'
         });
       },reject)    
-  })
+  })*/
 }
 
+/*
+var mongoose = require('mongoose');
+var config = require('../config');
+
+mongoose.connect(config.mongoConnection);
+
+parseQueryFromTweet('Larcomar climas')
+  .then(function(res) {
+    console.log(res);
+  });
+*/
 module.exports = {
   parseQueryFromTweet: parseQueryFromTweet,
   getMovie: getMovie,

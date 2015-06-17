@@ -5,7 +5,7 @@ var request = require('request');
 var scraper = function() {
   function scrap(url , cb) {
     request(url, function(err, res, html) {
-      if (err) cb(err);
+      if (err) return cb(err);
       cb(null, loadCheerio(html));
     })
   }

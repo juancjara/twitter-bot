@@ -13,7 +13,7 @@ function getField(tweet, path, def) {
 }
 
 function cleanText(text) {
-  return removeCaracters(text).replace(/  +/g, ' ');
+  return cleanSpaces(removeCaracters(text));
 }
 
 function cleanSpaces(text) {
@@ -21,7 +21,7 @@ function cleanSpaces(text) {
 }
 
 function removeCaracters(text) {
-  return text.replace(/[:\.',&\\]|( - )/g, '').toLowerCase()
+  return text.replace(/[:\.',&\\\(\)]|( - )/g, '').toLowerCase()
 }
 
 function uniqueArray(arr, getIdentifier) {

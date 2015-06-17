@@ -17,18 +17,29 @@ scheduleSchema.statics.create = function(params) {
     Movie.findOne({realName: params.movie}),
     Theater.findOne({realName: params.theater}),
   ];
+
   return Q.promise(function(resolve, reject) {
     Q.spread(tasks, function(movie, theater) {
-      new Schedule({
-        movie: movie._id,
-        theater: theater._id,
-        times: params.schedule
-      }).save(resolve);
+      
+      var fields = {
+        theaterId: theater._id,
+        movieId: movie._id
+      };
+
+      Theater.addMovie(fields, function(err, m) {
+        if (err) return reject(err);
+        new Schedule({
+          movie: movie._id,
+          theater: theater._id,
+          times: params.schedule
+        }).save(resolve);
+      });
     });
   })
 }
 
 scheduleSchema.statics.getOne = function(params) {
+  console.log(params);
   var tasks = [
     Movie.findById(params.movie),
     Theater.findById(params.theater),
@@ -41,6 +52,7 @@ scheduleSchema.statics.getOne = function(params) {
 
   return Q.promise(function(resolve, reject) {
     Q.spread(tasks, function(movie, theater) {
+      console.log('schedule getOne',movie.realName, theater.realName);
       Schedule.findOne({
         theater: params.theater,
         movie: params.movie

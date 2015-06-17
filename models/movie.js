@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Q = require('q');
+var Theater = require('./theater');
 
 var utils = require('../helpers/utils');
 
@@ -26,12 +27,18 @@ movieSchema.statics.findOrCreate = function(params) {
   var name = params.name;
   return Q.promise(function(resolve, reject) {
     Movie.findOne({realName: name}, function(err, m) {
-      if (err) reject(err);
+      if (err) return reject(err);
       if (m) return resolve(m);
-      new Movie(format(name)).save(resolve);
+      new Movie(format(name)).save(function(err, movie) {
+        if (err) return reject(err);
+        var fields = {
+          theaterId: params.theaterId,
+          movieId: movie._id
+        };
+        resolve(movie);
+      });
     });
   })
 }
-
 
 var Movie = module.exports = mongoose.model('Movie', movieSchema);

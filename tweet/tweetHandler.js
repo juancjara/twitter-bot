@@ -43,9 +43,19 @@ function getLocation(id) {
   });
 }
 
-function queryTweet(text) {
-  var queryFields = match.parseQueryFromTweet(text);
-  return models.schedule.getOne(queryFields);
+function findScheduleAndPost(msg, screen_name) {
+
+  match.parseQueryFromTweet(msg)
+    .then(models.schedule.getOne)
+    .then(function(data) { 
+      if(!data.schedule) {
+        data.schedule = 'No schedule found';
+      };
+      var posts = tweetBuilder.createPosts(screen_name, data);
+      posts.forEach(function(post) {
+        postTweet(post);
+      })
+    });
 }
 
 function handleNewTweet(tweet) {
@@ -54,25 +64,15 @@ function handleNewTweet(tweet) {
                      ['id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = removeHashTag(tweetFields.text);
   var msgClean = utils.cleanSpaces(msg);
+  
   console.log('msgClean', msgClean);
   if ( msgClean === 'help' || !msgClean.length ) {
     var post = tweetBuilder.createHelpMsg(tweetFields.screen_name);
-
     postTweet(post);
     return;
   }
 
-  match.parseQueryFromTweet(msg)
-    .then(models.schedule.getOne)
-    .then(function(data) { 
-      if(!data.schedule) {
-        data.schedule = 'No schedule found';
-      };
-      var posts = createPosts(tweetFields.screen_name, data);
-      posts.forEach(function(post) {
-        postTweet(post);
-      })
-    });
+  findScheduleAndPost(msg, tweetFields.screen_name);
     
 }
 
@@ -89,5 +89,12 @@ function postTweet(message) {
     }
   )
 }
+/*
+var mongoose = require('mongoose');
+var config = require('../config');
 
+mongoose.connect(config.mongoConnection);
+
+findScheduleAndPost('Larcomar climas', 'ggwp')
+*/
 module.exports.listenStream = listenStream;
