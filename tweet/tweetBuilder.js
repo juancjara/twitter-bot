@@ -1,53 +1,47 @@
 var format = require('string-template');
 
-function findNextIndexFit(arr, spaceAvailable) {
-  var spaceUsed = arr[0].length;
-  var index = 1;
-  while (index < arr.length) {
-    //+1 because of space
-    newSpace = arr[index].length + 1;
-    if (spaceUsed + newSpace > spaceAvailable) break;
-    spaceUsed += newSpace;
-    index++;
+var getSpace = function(max, fields, template) {
+  fields.content = '';
+  return max - format(template, fields).length;
+};
+
+var splitMsg = function(fields, spaceAvailable) {
+  var msgTemplate = 'movie: {movie} theater: {theater} -> {msg}';  
+  var message = format(msgTemplate, fields);
+  var msgs = [];
+
+  var len = message.length;
+  var i = Math.min(spaceAvailable, len);
+  var last = 0;
+  
+  while (last < len) {
+    var car = message.charAt(i);
+    if (i >= len || car === ' ') {
+      msgs.push(message.substring(last, i))
+      last = i;
+      i = Math.min(last + spaceAvailable, len);
+    } else {
+      i--;
+    }
   }
-  return index;
-}
+
+  return msgs;
+};
 
 function generateLongTweets(maxSpace, fields) {
   var tweets = [];
-  var times = fields.msg.split(' ');
-  var firstTweetTemplate = '@{to} movie:{movie} theater:{theater} -> {msg} ' +
-                           '({count}) {uniqueField}';
+  var mainTemplate = '@{to} {content} {uniqueField}';
+  var spaceAvailable = getSpace(maxSpace, fields, mainTemplate);
+  var arrMsg = splitMsg(fields, spaceAvailable);
 
-  var spaceAvailable = getSpaceWithoutMsg(maxSpace, fields, 
-                                          firstTweetTemplate);
-  var last = findNextIndexFit(times, spaceAvailable);
-  fields.msg = times.slice(0, last).join(' ');
-  tweets.push(format(firstTweetTemplate, fields));
-
-  var initial;
-  var nextTweetsTemplate = '@{to} {msg} ({count}) {uniqueField}';
-  spaceAvailable = getSpaceWithoutMsg(maxSpace, fields, nextTweetsTemplate);
-  
-  while(last < times.length) {
-    fields.count++;
-    initial = last;
-    last += findNextIndexFit(times.slice(initial), spaceAvailable);
-    fields.msg = times.slice(initial, last).join(' ');
-    tweets.push(format(nextTweetsTemplate, fields));
-  }
+  arrMsg.forEach(function(msg) {
+    fields.content = msg;
+    tweets.push(format(mainTemplate, fields));
+  })
 
   return tweets;
 }
 
-function shouldUseOneTweet(max, tweetSize) {
-  return tweetSize < max;
-}
-
-function getSpaceWithoutMsg(max, fields, template) {
-  fields.msg = '';
-  return max - format(template, fields).length;
-}
 
 function createPosts(to, queryInfo) {
   var fields = {
@@ -66,7 +60,7 @@ function createPosts(to, queryInfo) {
                          '{uniqueField}';
   var oneTweet = format(oneTweetTemplate, fields);
 
-  if (shouldUseOneTweet(maxSpace, oneTweet.length)) {
+  if (maxSpace >= oneTweet.length) {
     tweets.push(oneTweet);
   } else {
     tweets = generateLongTweets(maxSpace, fields);
