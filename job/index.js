@@ -28,9 +28,8 @@ var updater = new CronJob({
   onTick: update
 })
 
-clean(function() {
-  update();
-})
+clean();
+update();
 
 updater.start();
 cleaner.start();
