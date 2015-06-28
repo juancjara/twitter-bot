@@ -1,20 +1,37 @@
 var CronJob = require('cron').CronJob;
+var moment = require('moment');
 
-var updateDatabase = require('./dailyUpdateDatabase');
+var updateData = require('./updateData');
+var cleanData = require('./cleanData');
 //var time = '0 */1 * * * *';
-var time = '0 */2 * * *';//2 hours
+var twoHours = '0 */2 * * *';//2 hours
+var sixHours = '0 */6 * * *'; // 6 hours
 //var time = '00 30 3 * * *';
 
-var doOnTick = function() {
-	console.log('updateDatabase');
-	updateDatabase.start();
+var clean = function() {
+  console.log('cleaning', moment().toDate());
+  cleanData.start();
 };
 
-var job = new CronJob({
-  cronTime: time,
-  onTick: doOnTick
+var update = function() {
+	console.log('updateData', moment().toDate());
+	updateData.start();
+};
+
+var cleaner = new CronJob({
+  cronTime: sixHours,
+  onTick: clean
 })
 
-doOnTick();
+var updater = new CronJob({
+  cronTime: twoHours,
+  onTick: update
+})
 
-job.start();
+clean(function() {
+  update();
+})
+
+updater.start();
+cleaner.start();
+

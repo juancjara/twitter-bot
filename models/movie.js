@@ -24,6 +24,10 @@ function format(name) {
   }
 };
 
+movieSchema.statics.clean = function(condition) {
+  return Movie.remove(condition);
+}
+
 movieSchema.statics.findOrCreate = function(params) {
   var condition = {realName: params.name};
   var newData = format(params.name);
@@ -36,5 +40,7 @@ movieSchema.statics.findOrCreate = function(params) {
       })
   });
 }
+
+movieSchema.statics
 
 var Movie = module.exports = mongoose.model('Movie', movieSchema);

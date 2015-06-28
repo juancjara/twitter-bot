@@ -78,6 +78,30 @@ scheduleSchema.statics.getOne = function(params) {
   })
 }
 
+scheduleSchema.statics.clean = function(condition) {
+  
+  return Q.promise(function (resolve, reject) {
+    Schedule.find(condition, function(err, times) {
+      if (err) return reject(err);
+      
+      var cinemaMovieToRemove = times.map(function(time) {
+        return {
+          movie: time.toObject().movieId,
+          theater: time.toObject().theaterId
+        }
+      });
+
+      Theater.removeMovies(cinemaMovieToRemove)
+        .then(function(err) {
+          if (err) return reject(err);
+          console.log('doneS')
+          Schedule.remove(condition, resolve);
+        });
+    });
+
+  })
+}
+ 
 scheduleSchema.statics.clear = function () {
   return Q.promise(function (resolve, reject) {    
     Schedule.remove({}, function(err){

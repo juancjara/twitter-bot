@@ -9,7 +9,6 @@ var theaterSchema = new Schema({
   realName: String,
   simpleName: String,
   movies: [{type: Schema.Types.ObjectId, ref: 'Movie'}],
-  created: { type: Date, default: Date.now },
   updated: { type: Date, default: Date.now }
 });
 
@@ -18,13 +17,50 @@ theaterSchema.statics.getList = function (cb) {
 }
 
 theaterSchema.statics.addMovie = function(params, cb) {
-  Theater.findByIdAndUpdate(params.theaterId, 
-                            {$push: {movies: params.movieId}}, cb);
+  Theater.findById(params.theaterId, function(err, m) {
+    if (err) return cb(err);
+    var idx = m.movies.indexOf(params.movieId);
+    if (idx > -1) return cb(null);
+    m.movies.push(params.movieId)
+    m.save(cb);
+    // Theater.findByIdAndUpdate(params.theaterId, 
+    //                         {$push: {movies: params.movieId}}, cb);
+  });
+}
+
+pullMovie = function(params) {
+  return Theater.findByIdAndUpdate(params.theaterId, 
+                                   {$pullAll: {movies : params.movies}})
+}
+
+theaterSchema.statics.removeMovies = function(data) {
+  var dic = {};
+  var elem;
+
+  for (var i = data.length - 1; i >= 0; i--) {
+    elem = data[i];
+    if (!(elem.theater in dic)) {
+      dic[elem.theater] = {movies: [], theaterId: elem.theater};
+    }
+    dic[elem.theater].movies.push(elem.movie);
+  };
+
+  var tasks = utils.dicToArray(dic).map(pullMovie);
+  return Q.promise(function(resolve, reject) {
+    Q.all(tasks).then(function(m) {
+      console.log('done');
+      resolve();
+    })
+  })
 }
 
 theaterSchema.statics.getMovies = function(id, cb) {
   Theater.findOne({_id: id}, {}).populate("movies").exec(cb);
 };
+
+theaterSchema.statics.clean = function(condition) {
+  return Theater.remove(condition);
+}
 
 function format(name) {
   return {
@@ -37,7 +73,7 @@ function format(name) {
 theaterSchema.statics.findOrCreate = function(params) {
   var condition = {realName: params.name};
   var newData = format(params.name);
-  
+
   return Q.promise(function(resolve, reject) {
     Theater.findOneAndUpdate(condition, newData, {new: true, upsert: true},
       function(err,data) {

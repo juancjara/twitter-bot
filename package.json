@@ -23,7 +23,8 @@
     "q": "^1.4.1",
     "request": "^2.56.0",
     "string-template": "^0.2.1",
-    "twit": "^1.1.20"
+    "twit": "^1.1.20",
+    "moment": "~2.10.3"
   },
   "devDependencies": {
     "chai": "^2.3.0",
