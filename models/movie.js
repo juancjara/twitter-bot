@@ -8,7 +8,7 @@ var utils = require('../helpers/utils');
 var movieSchema = new Schema({
   realName: String,
   simpleName: String,
-  created: { type: Date, default: Date.now }
+  updated: { type: Date, default: Date.now }
 });
 
 movieSchema.statics.getList = function getList(cb) {
@@ -19,26 +19,22 @@ function format(name) {
   name = name || '';
   return {
     realName: name,
-    simpleName: utils.cleanText(name)
+    simpleName: utils.cleanText(name),
+    updated: Date.now()
   }
 };
 
 movieSchema.statics.findOrCreate = function(params) {
-  var name = params.name;
+  var condition = {realName: params.name};
+  var newData = format(params.name);
+
   return Q.promise(function(resolve, reject) {
-    Movie.findOne({realName: name}, function(err, m) {
-      if (err) return reject(err);
-      if (m) return resolve(m);
-      new Movie(format(name)).save(function(err, movie) {
+    Movie.findOneAndUpdate(condition, newData, {new: true, upsert: true},
+      function(err, data) {
         if (err) return reject(err);
-        var fields = {
-          theaterId: params.theaterId,
-          movieId: movie._id
-        };
-        resolve(movie);
-      });
-    });
-  })
+        resolve(data);
+      })
+  });
 }
 
 var Movie = module.exports = mongoose.model('Movie', movieSchema);

@@ -9,6 +9,7 @@ var Theater = require('./theater');
 var scheduleSchema = new Schema({
   theater : {type: ObjectId, ref: 'Theater'},
   movie : {type: ObjectId, ref: 'Movie'},
+  updated: {type: Date, default: Date.now},
   times: String
 })
 
@@ -20,7 +21,6 @@ scheduleSchema.statics.create = function(params) {
 
   return Q.promise(function(resolve, reject) {
     Q.spread(tasks, function(movie, theater) {
-      
       var fields = {
         theaterId: theater._id,
         movieId: movie._id
@@ -28,14 +28,23 @@ scheduleSchema.statics.create = function(params) {
 
       Theater.addMovie(fields, function(err, m) {
         if (err) return reject(err);
-        new Schedule({
-          movie: movie._id,
-          theater: theater._id,
-          times: params.schedule
-        }).save(resolve);
-      });
-    });
-  })
+
+        Schedule.findOneAndUpdate(fields, 
+          {
+            theaterId: theater._id,
+            movieId: movie._id  ,
+            times: params.schedule,
+            updated: Date.now()
+          },
+          {new: true, upsert: true},
+          function(err, m) {
+            if (err) return reject(err);
+            resolve(m);
+          }
+        )
+      })
+    })
+  });
 }
 
 scheduleSchema.statics.getOne = function(params) {
