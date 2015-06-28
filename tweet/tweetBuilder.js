@@ -56,7 +56,7 @@ function createPosts(to, queryInfo) {
   var maxSpace = 140;
   var tweets = [];
 
-  var oneTweetTemplate = '@{to} movie:{movie} theater:{theater} -> {msg} ' + 
+  var oneTweetTemplate = '@{to} pelicula:{movie} cine:{theater} -> {msg} ' + 
                          '{uniqueField}';
   var oneTweet = format(oneTweetTemplate, fields);
 
@@ -71,7 +71,7 @@ function createPosts(to, queryInfo) {
 function createHelpMsg(to) {
   var fields = {
     to: to,
-    msg: 'Hey, tweet movie and cinema to get the schedule',
+    msg: 'Dame pelicula y cine y recibes el horario',
     uniqueField: '*' + (new Date()).getMilliseconds()
   }
 
