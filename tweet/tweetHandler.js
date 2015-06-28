@@ -89,12 +89,12 @@ function postTweet(message) {
     }
   )
 }
-/*
-var mongoose = require('mongoose');
-var config = require('../config');
 
-mongoose.connect(config.mongoConnection);
+// var mongoose = require('mongoose');
+// var config = require('../config');
 
-findScheduleAndPost('Larcomar climas', 'ggwp')
-*/
+// mongoose.connect(config.mongoConnection);
+
+// findScheduleAndPost('larcomar Terminator ', 'ggwp')
+
 module.exports.listenStream = listenStream;

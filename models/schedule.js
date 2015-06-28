@@ -63,9 +63,10 @@ scheduleSchema.statics.getOne = function(params) {
     Q.spread(tasks, function(movie, theater) {
       console.log('schedule getOne',movie.realName, theater.realName);
       Schedule.findOne({
-        theater: params.theater,
-        movie: params.movie
+        theaterId: params.theater,
+        movieId: params.movie
       },function(err, m) {
+
         if (err) return reject(err);
         var response = {
           schedule: m ? m.times : '',
@@ -94,7 +95,6 @@ scheduleSchema.statics.clean = function(condition) {
       Theater.removeMovies(cinemaMovieToRemove)
         .then(function(err) {
           if (err) return reject(err);
-          console.log('doneS')
           Schedule.remove(condition, resolve);
         });
     });
