@@ -6,7 +6,7 @@ var getSpace = function(max, fields, template) {
 };
 
 var splitMsg = function(fields, spaceAvailable) {
-  var msgTemplate = 'movie: {movie} theater: {theater} -> {msg}';  
+  var msgTemplate = 'pelicula: {movie} cine: {theater} -> {msg}';  
   var message = format(msgTemplate, fields);
   var msgs = [];
 
