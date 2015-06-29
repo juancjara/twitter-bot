@@ -21,6 +21,7 @@ function removeUser(text) {
 function parseFieldsFromTweet(tweet, fields) {
   var parsed = {};
   var mapFields = {
+    user_id: 'user.id',
     id: 'id',
     name: 'user.name',
     screen_name: 'user.screen_name',
@@ -75,7 +76,7 @@ function handleNewTweet(tweet) {
 
   
   var tweetFields = parseFieldsFromTweet(tweet,
-                     ['id', 'name', 'screen_name', 'text', 'hashtags']);
+                     ['id','user_id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = tweetFields.text;
   if (msg.indexOf('boterino123') < 0 && msg.indexOf(config.hashtag) < 0) {
     return;
@@ -121,6 +122,6 @@ function postTweet(message) {
 
 module.exports.listenStream = listenStream;
 
-follow(615385295803056100,function(err) {
-  console.log('ggwp', err)
-})
+// follow(3252772133,function(err) {
+//   console.log('ggwp', err)
+// })
