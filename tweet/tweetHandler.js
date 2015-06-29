@@ -14,6 +14,10 @@ function removeHashTag(text) {
   return text.replace(/#\w+/i, '');
 }
 
+function removeUser(text) {
+  return text.replace(/@\w/i, '')
+}
+
 function parseFieldsFromTweet(tweet, fields) {
   var parsed = {};
   var mapFields = {
@@ -65,9 +69,9 @@ function handleNewTweet(tweet) {
                      ['id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = removeHashTag(tweetFields.text);
   if (msg.indexOf('boterino123') < 0) {
-    console.log('no pasa');
     return;
   }
+  msg = removeUser(msg);
 
   var msgClean = utils.cleanSpaces(msg);
   console.log(tweetFields);
