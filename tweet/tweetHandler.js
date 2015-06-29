@@ -61,10 +61,14 @@ function findScheduleAndPost(msg, screen_name) {
 function handleNewTweet(tweet) {
 
   console.log('------------------on tweet --------------------------');
-  console.log(tweet)
   var tweetFields = parseFieldsFromTweet(tweet,
                      ['id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = removeHashTag(tweetFields.text);
+  if (msg.indexOf('boterino123') < 0) {
+    console.log('no pasa');
+    return;
+  }
+
   var msgClean = utils.cleanSpaces(msg);
   console.log(tweetFields);
   console.log('msgClean', msgClean);
