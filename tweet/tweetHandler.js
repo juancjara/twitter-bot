@@ -62,7 +62,14 @@ function findScheduleAndPost(msg, screen_name) {
     });
 }
 
-
+function follow(id, cb) {
+  T.post('friendships/create', {user_id: id, follow: true},
+         function(err, data, response) {
+            if (err) return cb('follow ' + err);
+            cb(null);
+          }
+  )
+}
 
 function handleNewTweet(tweet) {
 
@@ -113,3 +120,7 @@ function postTweet(message) {
 // findScheduleAndPost('larcomar Terminator ', 'ggwp')
 
 module.exports.listenStream = listenStream;
+
+follow(615385295803056100,function(err) {
+  console.log('ggwp', err)
+})
