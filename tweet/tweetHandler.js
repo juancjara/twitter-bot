@@ -122,6 +122,6 @@ function postTweet(message) {
 
 module.exports.listenStream = listenStream;
 
-// follow(3252772133,function(err) {
-//   console.log('ggwp', err)
-// })
+follow(1250724692,function(err) {
+  console.log('ggwp', err)
+})
