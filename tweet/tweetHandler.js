@@ -83,7 +83,10 @@ function handleNewTweet(tweet) {
   }
   console.log('------------------on tweet --------------------------');
   
-  follow(tweetFields.user_id, handleMessage);
+  follow(tweetFields.user_id, function(err) {
+    if (err) return console.log(err);
+    handleMessage(tweetFields);
+  });
     
 }
 
