@@ -59,7 +59,9 @@ function findScheduleAndPost(msg, screen_name) {
 }
 
 function handleNewTweet(tweet) {
+
   console.log('------------------on tweet --------------------------');
+  console.log(tweet)
   var tweetFields = parseFieldsFromTweet(tweet,
                      ['id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = removeHashTag(tweetFields.text);
