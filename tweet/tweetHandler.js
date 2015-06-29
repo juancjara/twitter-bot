@@ -82,7 +82,13 @@ function handleNewTweet(tweet) {
     return;
   }
   console.log('------------------on tweet --------------------------');
-  var msg = removeHashTag(msg);
+  
+  follow(tweetFields.user_id, handleMessage);
+    
+}
+
+function handleMessage(tweetFields) {
+  var msg = removeHashTag(tweetFields.text);
   msg = removeUser(msg);
 
   var msgClean = utils.cleanSpaces(msg);
@@ -95,7 +101,6 @@ function handleNewTweet(tweet) {
   }
 
   findScheduleAndPost(msg, tweetFields.screen_name);
-    
 }
 
 function listenStream(hashtag) {
@@ -122,6 +127,6 @@ function postTweet(message) {
 
 module.exports.listenStream = listenStream;
 
-follow(1250724692,function(err) {
-  console.log('ggwp', err)
-})
+// follow(1250724692,function(err) {
+//   console.log('ggwp', err)
+// })
