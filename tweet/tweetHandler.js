@@ -62,15 +62,18 @@ function findScheduleAndPost(msg, screen_name) {
     });
 }
 
+
+
 function handleNewTweet(tweet) {
 
   console.log('------------------on tweet --------------------------');
   var tweetFields = parseFieldsFromTweet(tweet,
                      ['id', 'name', 'screen_name', 'text', 'hashtags']);
-  var msg = removeHashTag(tweetFields.text);
-  if (msg.indexOf('boterino123') < 0) {
+  
+  if (msg.indexOf('boterino123') < 0 && msg.indexOf(config.hashtag) < 0) {
     return;
   }
+  var msg = removeHashTag(tweetFields.text);
   msg = removeUser(msg);
 
   var msgClean = utils.cleanSpaces(msg);
@@ -87,9 +90,9 @@ function handleNewTweet(tweet) {
 }
 
 function listenStream(hashtag) {
-  //var stream = T.stream('statuses/filter', { track: hashtag});
-  var stream = T.stream('user');
-  stream.on('tweet',handleNewTweet);
+  T.stream('statuses/filter', { track: hashtag});
+  T.stream('user').on('tweet',handleNewTweet);;
+  
 }
 
 function postTweet(message) {
