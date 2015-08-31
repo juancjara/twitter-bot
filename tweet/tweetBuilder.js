@@ -13,7 +13,7 @@ var splitMsg = function(fields, spaceAvailable) {
   var len = message.length;
   var i = Math.min(spaceAvailable, len);
   var last = 0;
-  
+
   while (last < len) {
     var car = message.charAt(i);
     if (i >= len || car === ' ') {

@@ -1,5 +1,4 @@
 var Q = require('q');
-
 var Twit = require('twit');
 
 var models = require('../models');
@@ -10,15 +9,15 @@ var tweetBuilder = require('./tweetBuilder');
 
 var T = new Twit(config.twitter);
 
-function removeHashTag(text) {
+var removeHashTag = function(text) {
   return text.replace(/#\w+/i, '');
-}
+};
 
-function removeUser(text) {
+var removeUser = function(text) {
   return text.replace(/@\w/i, '')
-}
+};
 
-function parseFieldsFromTweet(tweet, fields) {
+var parseFieldsFromTweet = function(tweet, fields) {
   var parsed = {};
   var mapFields = {
     user_id: 'user.id',
@@ -34,11 +33,10 @@ function parseFieldsFromTweet(tweet, fields) {
       parsed[k] = utils.getField(tweet, mapFields[k], 'none '+k);
     }
   })
-  
   return parsed;
-}
+};
 
-function getLocation(id) {
+var getLocation = function(id) {
   console.log(getLocation);
   return Q.promise(function (resolve, reject) {
     T.get('statuses/show/:id', {id: id}, function (err, data, response) {
@@ -46,9 +44,9 @@ function getLocation(id) {
       console.log(data);
     });
   });
-}
+};
 
-function findScheduleAndPost(msg, screen_name) {
+var findScheduleAndPost = function(msg, screen_name) {
 
   match.parseQueryFromTweet(msg)
     .then(models.schedule.getOne)
@@ -61,20 +59,19 @@ function findScheduleAndPost(msg, screen_name) {
         postTweet(post);
       })
     });
-}
+};
 
-function follow(id, cb) {
+var follow = function(id, cb) {
   T.post('friendships/create', {user_id: id, follow: true},
-         function(err, data, response) {
-            if (err) return cb('follow ' + err);
-            cb(null);
-          }
+    function(err, data, response) {
+      if (err) return cb('follow ' + err);
+      cb(null);
+    }
   )
-}
+};
 
-function handleNewTweet(tweet) {
+var handleNewTweet = function(tweet) {
 
-  
   var tweetFields = parseFieldsFromTweet(tweet,
                      ['id','user_id', 'name', 'screen_name', 'text', 'hashtags']);
   var msg = tweetFields.text;
@@ -82,15 +79,13 @@ function handleNewTweet(tweet) {
     return;
   }
   console.log('------------------on tweet --------------------------');
-  
   follow(tweetFields.user_id, function(err) {
     if (err) return console.log(err);
     handleMessage(tweetFields);
   });
-    
-}
+};
 
-function handleMessage(tweetFields) {
+var handleMessage = function(tweetFields) {
   var msg = removeHashTag(tweetFields.text);
   msg = removeUser(msg);
 
@@ -104,22 +99,21 @@ function handleMessage(tweetFields) {
   }
 
   findScheduleAndPost(msg, tweetFields.screen_name);
-}
+};
 
-function listenStream(hashtag) {
+var listenStream = function(hashtag) {
   T.stream('statuses/filter', { track: hashtag});
   T.stream('user').on('tweet',handleNewTweet);;
-  
-}
+};
 
-function postTweet(message) {
+var postTweet = function(message) {
   T.post('statuses/update', {status: message},
     function(err, data, response) {
       if (err) return console.log(err);
       console.log('posted', message);
     }
   )
-}
+};
 
 // var mongoose = require('mongoose');
 // var config = require('../config');
