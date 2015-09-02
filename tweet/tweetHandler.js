@@ -117,8 +117,6 @@ var tweetMoviesFromCinema = function(to, cinema) {
       })
       .join(' ,')
   };
-  console.log('tweetMoviesFromCinema');
-  console.log(fields);
   //var post = tweetBuilder.moviesPost(to, fields)
 };
 

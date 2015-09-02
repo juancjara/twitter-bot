@@ -28,7 +28,7 @@ var splitMsg = function(fields, spaceAvailable) {
   return msgs;
 };
 
-function generateLongTweets(maxSpace, fields) {
+var generateLongTweets = function(maxSpace, fields) {
   var tweets = [];
   var mainTemplate = '@{to} {content} {uniqueField}';
   var spaceAvailable = getSpace(maxSpace, fields, mainTemplate);
@@ -40,7 +40,7 @@ function generateLongTweets(maxSpace, fields) {
   })
 
   return tweets;
-}
+};
 
 
 var createPosts = function(to, queryInfo) {
@@ -94,4 +94,5 @@ module.exports = {
   createPosts: createPosts,
   createHelpMsg: createHelpMsg,
   createSimpleMsg: createSimpleMsg
-}
+};
+
