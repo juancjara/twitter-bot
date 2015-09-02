@@ -9,7 +9,6 @@ var splitMsg = function(fields, spaceAvailable) {
   var msgTemplate = 'pelicula: {movie} cine: {theater} -> {msg}';  
   var message = format(msgTemplate, fields);
   var msgs = [];
-
   var len = message.length;
   var i = Math.min(spaceAvailable, len);
   var last = 0;
@@ -52,10 +51,8 @@ var createPosts = function(to, queryInfo) {
     theater: queryInfo.theater,
     uniqueField: '*' + (new Date()).getMilliseconds()
   }
-
   var maxSpace = 140;
   var tweets = [];
-
   var oneTweetTemplate = '@{to} pelicula:{movie} cine:{theater} -> {msg} ' + 
                          '{uniqueField}';
   var oneTweet = format(oneTweetTemplate, fields);
@@ -73,8 +70,7 @@ var createHelpMsg = function(to) {
     to: to,
     msg: 'Dame pelicula y cine y recibes el horario',
     uniqueField: '*' + (new Date()).getMilliseconds()
-  }
-
+  };
   var template = '@{to} {msg} {uniqueField}';
   return format(template, fields);
 };
@@ -85,7 +81,6 @@ var createSimpleMsg = function(to, msg) {
     msg: msg,
     uniqueField: '*' + (new Date()).getMilliseconds()
   };
-
   var template = '@{to} {msg} {uniqueField}';
   return format(template, fields);
 };
