@@ -1,6 +1,7 @@
-function getField(tweet, path, def) {
+var getField = function(tweet, path, def) {
   var paths = path.split('.');
   var field = JSON.parse(JSON.stringify(tweet));
+
   for (var i = 0; i < paths.length; i++) {
     if (paths[i] in field) {
       field = field[paths[i]];
@@ -8,47 +9,48 @@ function getField(tweet, path, def) {
       return def;
     }
   };
-  
+
   return field;
-}
+};
 
-function cleanText(text) {
+var cleanText = function(text) {
   return cleanSpaces(removeCaracters(text));
-}
+};
 
-function cleanSpaces(text) {
+var cleanSpaces = function(text) {
   return text.replace(/ /g, '');
-}
+};
 
-function removeCaracters(text) {
+var removeCaracters = function(text) {
   return text.replace(/[:\.',&\\\(\)]|( - )/g, '').toLowerCase()
-}
+};
 
-function uniqueArray(arr, getIdentifier) {
+var uniqueArray = function(arr, getIdentifier) {
   var dic = {};
   return arr.filter(function(item) {
     var id = getIdentifier(item);
     return dic.hasOwnProperty(id) ? false: (dic[id] = true); 
   })
-}
+};
 
-function createSimilars(text) {
+var createSimilars = function(text) {
   var temp = removeCaracters(text).split(' ');
   var similars = temp.filter(function(item) {
     return item.length > 0;
   });
   return similars;
-}
+};
 
-function dicToArray(dic) {
+//TODO change to use Object.keys
+var dicToArray = function(dic) {
   var arr = [];
   for(var k in dic) {
     arr.push(dic[k]);
   }
   return arr;
-}
+};
 
-function groupArray(arr, groupBy, mix) {
+var groupArray = function(arr, groupBy, mix) {
   var dic = {};
   var id;
   for(var i = 0, l = arr.length; i < l; i++) {
@@ -57,19 +59,19 @@ function groupArray(arr, groupBy, mix) {
     dic[id] = mix(dic[id], arr[i]);
   }
   return dicToArray(dic);
-}
+};
 
-function argsToArray(args) {
+var argsToArray = function(args) {
   return args = Array.prototype.slice.call(args);
-}
+};
 
-function partial(fn) {
+var partial = function(fn) {
   var pastArgs = argsToArray(arguments).slice(1);
   return function() {
     var newArgs = argsToArray(arguments);
     return fn.apply(null, pastArgs.concat(newArgs));
   }
-}
+};
 
 module.exports = {
   groupArray: groupArray,
