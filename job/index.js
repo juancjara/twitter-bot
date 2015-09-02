@@ -4,8 +4,8 @@ var moment = require('moment');
 var updateData = require('./updateData');
 var cleanData = require('./cleanData');
 //var time = '0 */1 * * * *';
-var twoHours = '0 */2 * * *';//2 hours
-var sixHours = '0 */6 * * *'; // 6 hours
+var twoHours = '0 */2 * * *';
+var sixHours = '0 */6 * * *';
 //var time = '00 30 3 * * *';
 
 var clean = function() {

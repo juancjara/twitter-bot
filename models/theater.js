@@ -14,7 +14,7 @@ var theaterSchema = new Schema({
 
 theaterSchema.statics.getList = function (cb) {
   Theater.find(cb);
-}
+};
 
 theaterSchema.statics.addMovie = function(params, cb) {
   Theater.findById(params.theaterId, function(err, m) {
@@ -23,8 +23,6 @@ theaterSchema.statics.addMovie = function(params, cb) {
     if (idx > -1) return cb(null);
     m.movies.push(params.movieId)
     m.save(cb);
-    // Theater.findByIdAndUpdate(params.theaterId, 
-    //                         {$push: {movies: params.movieId}}, cb);
   });
 }
 
@@ -54,8 +52,14 @@ theaterSchema.statics.removeMovies = function(data) {
   })
 }
 
-theaterSchema.statics.getMovies = function(id, cb) {
-  Theater.findOne({_id: id}, {}).populate("movies").exec(cb);
+theaterSchema.statics.getMovies = function(id) {
+  return Q.promise(function(resolve, reject) {
+    Theater.findOne({_id: id}, {}).populate("movies")
+      .exec(function(err, model) {
+        if (err) return reject(err);
+        resolve(model);
+      });
+  })
 };
 
 theaterSchema.statics.clean = function(condition) {

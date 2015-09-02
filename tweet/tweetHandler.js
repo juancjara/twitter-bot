@@ -1,6 +1,8 @@
 var Q = require('q');
 var Twit = require('twit');
 
+var cinema = require('../models/theater');
+var schedule = require('../models/schedule');
 var models = require('../models');
 var utils = require('../helpers/utils');
 var config = require('../config');
@@ -26,13 +28,14 @@ var parseFieldsFromTweet = function(tweet, fields) {
     screen_name: 'user.screen_name',
     text: 'text',
     hashtags: 'entities.hashtags'
-  }
+  };
 
   fields.forEach(function(k) {
     if (k in mapFields) {
       parsed[k] = utils.getField(tweet, mapFields[k], 'none '+k);
     }
   })
+
   return parsed;
 };
 
@@ -79,31 +82,73 @@ var handleNewTweet = function(tweet) {
     return;
   }
   console.log('------------------on tweet --------------------------');
-  follow(tweetFields.user_id, function(err) {
+  followTweetUser(tweetFields.user_id, function(err) {
     if (err) return console.log(err);
     handleMessage(tweetFields);
   });
 };
 
-var handleMessage = function(tweetFields) {
-  var msg = removeHashTag(tweetFields.text);
-  msg = removeUser(msg);
+var extractValFromHashtag = function(text, regex) {
+  var matches = text.match(regex);
+  if (!matches) return '';
+  return text.match(regex)[0].replace(/#[a-z] /, '').trim();
+};
 
-  var msgClean = utils.cleanSpaces(msg);
-  console.log(tweetFields);
-  console.log('msgClean', msgClean);
-  if ( msgClean === 'help' || !msgClean.length ) {
-    var post = tweetBuilder.createHelpMsg(tweetFields.screen_name);
-    postTweet(post);
-    return;
+var extractMovieAndCinema = function(text) {
+  return {
+    movie: extractValFromHashtag(text, /#m [^#]*/),
+    cinema: extractValFromHashtag(text, /#c [^#]*/)
   }
+};
 
-  findScheduleAndPost(msg, tweetFields.screen_name);
+var tweetMovieTimes = function(to, timeInfo) {
+  var posts = tweetBuilder.createPosts(to, timeInfo);
+  posts.forEach(function(post) {
+    postTweet(post);
+  })
+};
+
+var tweetMoviesFromCinema = function(to, cinema) {
+  var fields = {
+    cinema: cinema.realName,
+    movies: cinema.movies
+      .map(function(movie) {
+        return movie.realName;
+      })
+      .join(' ,')
+  };
+  console.log('tweetMoviesFromCinema');
+  console.log(fields);
+  //var post = tweetBuilder.moviesPost(to, fields)
+};
+
+var messages = {
+  NOT_FOUND: 'No data found'
+};
+
+var chooseResponse = function(to, matches) {
+  if (!matches.movie && !matches.theater) {
+    postTweet(tweetBuilder.createSimpleMsg(to, message.NOT_FOUND));
+  } else if (!matches.movie && matches.theater) {
+    cinema
+      .getMovies(matches.theater)
+      .then(utils.partial(tweetMoviesFromCinema, to));
+  } if (matches.movie && matches.theater) {
+    schedule.getOne(matches)
+      .then(utils.partial(tweetMovieTime, to));
+  }
+};
+
+var handleMessage = function(tweetFields) {
+  var queryFields = extractMovieAndCinema(tweetFields.text);
+  match.findMovieTimes(queryFields)
+    .then(utils.partial(chooseResponse, tweetFields.screen_name));
 };
 
 var listenStream = function(hashtag) {
-  T.stream('statuses/filter', { track: hashtag});
-  T.stream('user').on('tweet',handleNewTweet);;
+  var stream = T.stream('statuses/filter', { track: hashtag});
+  stream.on('tweet', handleNewTweet);
+  T.stream('user').on('tweet', handleNewTweet);
 };
 
 var postTweet = function(message) {
@@ -115,15 +160,13 @@ var postTweet = function(message) {
   )
 };
 
-// var mongoose = require('mongoose');
-// var config = require('../config');
+var mongoose = require('mongoose');
+var config = require('../config');
 
-// mongoose.connect(config.mongoConnection);
+mongoose.connect(config.mongoConnection);
 
-// findScheduleAndPost('larcomar Terminator ', 'ggwp')
+handleMessage({screen_name: 'ggas', text: '#c asdf 123 awer'});
 
-module.exports.listenStream = listenStream;
+module.exports = listenStream;
+listenStream.listenStream = listenStream;
 
-// follow(1250724692,function(err) {
-//   console.log('ggwp', err)
-// })

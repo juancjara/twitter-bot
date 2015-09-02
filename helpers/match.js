@@ -1,14 +1,15 @@
 var Q = require('q');
 var models = require('../models');
+var cinema = require('../models/theater');
 var utils = require('./utils');
 
-function sortDescByRank(a, b) {
+var sortDescByRank = function(a, b) {
   return b.rank - a.rank;
-}
+};
 
-function lcs(str1, str2) {
+var lcs = function(str1, str2) {
   var longestCS = 0;
-  
+
   var m = [];
   var len1 = str1.length;
   var len2 = str2.length;
@@ -19,7 +20,7 @@ function lcs(str1, str2) {
       m[row][col] = 0;
     }
   }
-  
+
   var i, j;
   for(i = 0; i < len1; i++){
     for(j = 0; j < len2; j++){
@@ -38,9 +39,9 @@ function lcs(str1, str2) {
     }
   }
   return longestCS;
-}
+};
 
-function getType(text, item) {
+var getType = function(text, item) {
   var length = item.simpleName.length;
   var lengthMatch = lcs(item.simpleName, text);
   return obj = {
@@ -48,15 +49,17 @@ function getType(text, item) {
     _id: item._id,
     name: item.realName
   }
-}
+};
 
-function getId(words, list) {
+var getId = function(words, list) {
   return list.map(utils.partial(getType, words))
           .sort(sortDescByRank)[0]._id;
-}
+};
 
-function getTypeFromPromise(text, model) {
+var getTypeFromPromise = function(text, model) {
   return Q.promise(function(resolve, reject) {
+    if (!text || !text.length)
+      return resolve(null);
     model.getList(function(err, list) {
       if (err) return reject(err);
       if (!list || !list.length) {
@@ -65,33 +68,39 @@ function getTypeFromPromise(text, model) {
       resolve(getId(text, list));
     })
   })
-} 
+};
 
-function getMovieFromCinema(text,id) {
+var getMovieFromCinema = function(text, id) {
+  console.log(text, id);
   return Q.promise(function(resolve, reject) {
-    models.theater.getMovies(id, function(err, theater) {
-      if (err) return reject(err);
-      if (!theater.movies || !theater.movies.length) {
-        reject('no list found');
-      }
-      resolve(getId(text, theater.movies));
-    })    
+    if (!text || !text.length)
+      return resolve(null);
+    console.log('asdf');
+    cinema
+      .getMovies(id)
+      .then(function(theater) {
+        console.log('here', theater);
+        if (!theater.movies || !theater.movies.length) {
+          reject('no list found');
+        }
+        resolve(getId(text, theater.movies));
+      })
   })
-}
+};
 
-function getMovie(text) {
+var getMovie = function(text) {
   return getTypeFromPromise(text, models.movie);
-}
+};
 
-function getCinema(text) {
+var getCinema = function(text) {
   return getTypeFromPromise(text, models.theater);
-}
+};
 
-function getQuery(text) {
+var getQuery = function(text) {
   return getTypeFromPromise(text, models.query);
-}
+};
 
-function parseQueryFromTweet(text) {
+var parseQueryFromTweet = function(text) {
   text =  utils.cleanText(text);
   return Q.promise(function(resolve, reject) {
     getCinema(text).then(function(cinemaId) {
@@ -102,31 +111,41 @@ function parseQueryFromTweet(text) {
             theater: cinemaId
         })
       });;
-    })  
+    })
   })
-  
-  /*var tasks = [
-    getCinema(text)
-  ];
+};
 
+var findMovieTimes = function(fields) {
   return Q.promise(function(resolve, reject) {
-    Q.all(tasks)
-      .then(function(results) {
-        resolve({
-          movie: results[0],
-          theater: results[1],
-          query: 'schedule'
-        });
-      },reject)    
-  })*/
-}
-
+    getCinema(fields.cinema).then(function(cinemaId) {
+      getMovieFromCinema(fields.movie, cinemaId)
+        .then(function(movieId) {
+          resolve({
+            movie: movieId,
+            theater: cinemaId
+          })
+        });;
+    })
+  })
+};
 /*
 var mongoose = require('mongoose');
 var config = require('../config');
 
 mongoose.connect(config.mongoConnection);
 
+var data = {
+  cinema: 'cinemark',
+  movie: 'intocables'
+};
+
+findMovieTimes(data)
+  .then(models.schedule.getOne)
+  .then(function(gg){
+    console.log(gg);
+  });
+*/
+/*
 parseQueryFromTweet('Larcomar climas')
   .then(function(res) {
     console.log(res);
@@ -136,5 +155,6 @@ module.exports = {
   parseQueryFromTweet: parseQueryFromTweet,
   getMovie: getMovie,
   getCinema: getCinema,
-  getQuery: getQuery
+  getQuery: getQuery,
+  findMovieTimes: findMovieTimes
 }

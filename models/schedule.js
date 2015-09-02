@@ -29,7 +29,7 @@ scheduleSchema.statics.create = function(params) {
       Theater.addMovie(fields, function(err, m) {
         if (err) return reject(err);
 
-        Schedule.findOneAndUpdate(fields, 
+        Schedule.findOneAndUpdate(fields,
           {
             theaterId: theater._id,
             movieId: movie._id  ,
@@ -71,7 +71,7 @@ scheduleSchema.statics.getOne = function(params) {
         var response = {
           schedule: m ? m.times : '',
           movie: movie.realName,
-          theater: theater.realName
+          cinema: theater.realName
         }
         return resolve(response);
       })

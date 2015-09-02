@@ -43,7 +43,7 @@ function generateLongTweets(maxSpace, fields) {
 }
 
 
-function createPosts(to, queryInfo) {
+var createPosts = function(to, queryInfo) {
   var fields = {
     to: to,
     msg: queryInfo.schedule,
@@ -66,9 +66,9 @@ function createPosts(to, queryInfo) {
     tweets = generateLongTweets(maxSpace, fields);
   }
   return tweets;
-}
+};
 
-function createHelpMsg(to) {
+var createHelpMsg = function(to) {
   var fields = {
     to: to,
     msg: 'Dame pelicula y cine y recibes el horario',
@@ -77,9 +77,21 @@ function createHelpMsg(to) {
 
   var template = '@{to} {msg} {uniqueField}';
   return format(template, fields);
-}
+};
+
+var createSimpleMsg = function(to, msg) {
+  var fields = {
+    to: to,
+    msg: msg,
+    uniqueField: '*' + (new Date()).getMilliseconds()
+  };
+
+  var template = '@{to} {msg} {uniqueField}';
+  return format(template, fields);
+};
 
 module.exports = {
   createPosts: createPosts,
-  createHelpMsg: createHelpMsg
+  createHelpMsg: createHelpMsg,
+  createSimpleMsg: createSimpleMsg
 }
