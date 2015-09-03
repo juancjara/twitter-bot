@@ -96,7 +96,7 @@ var extractValFromHashtag = function(text, regex) {
 
 var extractMovieAndCinema = function(text) {
   return {
-    movie: extractValFromHashtag(text, /#m [^#]*/),
+    movie: extractValFromHashtag(text, /#p [^#]*/),
     cinema: extractValFromHashtag(text, /#c [^#]*/)
   }
 };
@@ -122,11 +122,13 @@ var tweetMoviesFromCinema = function(to, cinema) {
 };
 
 var messages = {
-  NOT_FOUND: 'Not found, this is how u do it'
+  NOT_FOUND: 'Para obtener las peliculas de un cine tweetea: #c NombreDelCine' +
+    '. Y para obtener el horario: #p NombreDePelicula #c NombreDelCine'
 };
 
 var sendTweetNoMatches = function(to) {
-  postTweet(tweetBuilder.createSimpleMsg(to, messages.NOT_FOUND));
+  tweetBuilder.createSimpleMsg(to, messages.NOT_FOUND)
+    .forEach(postTweet);
 };
 
 var sendTweetMovieList = function(to, matches) {

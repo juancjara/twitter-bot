@@ -73,6 +73,10 @@ var templates = {
   movieList: {
     singleTweet: '@{to} cine:{cinema} -> {msg} {uniqueField}',
     multipleTweets: 'cine: {cinema} -> {msg}'
+  },
+  general: {
+    singleTweet: '@{to} {msg} {uniqueField}',
+    multipleTweets: '{msg}'
   }
 };
 
@@ -86,23 +90,16 @@ var createPosts = function(to, queryInfo) {
   return createTweets(fields, templates.times);
 };
 
-var createHelpMsg = function(to) {
-  return createSimpleMsg(to, 'Dame pelicula y cine y recibes el horario');
-};
-
 var createSimpleMsg = function(to, msg) {
   var fields = {
     to: to,
-    msg: msg,
-    uniqueField: utils.generateUniqueField()
+    msg: msg
   };
-  var template = '@{to} {msg} {uniqueField}';
-  return format(template, fields);
+  return createTweets(fields, templates.general);
 };
 
 module.exports = {
   createPosts: createPosts,
-  createHelpMsg: createHelpMsg,
   createSimpleMsg: createSimpleMsg,
   moviesPost: moviesPost
 };
