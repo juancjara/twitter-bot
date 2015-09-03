@@ -64,7 +64,7 @@ var findScheduleAndPost = function(msg, screen_name) {
     });
 };
 
-var follow = function(id, cb) {
+var followTweetUser = function(id, cb) {
   T.post('friendships/create', {user_id: id, follow: true},
     function(err, data, response) {
       if (err) return cb('follow ' + err);
