@@ -122,19 +122,35 @@ var tweetMoviesFromCinema = function(to, cinema) {
 };
 
 var messages = {
-  NOT_FOUND: 'No data found'
+  NOT_FOUND: 'Not found, this is how u do it';
+};
+
+var noMatches = function(matches) {
+  return !matches.movie && !matches.theater;
+};
+
+var sendTweetNotMatches = function(to) {
+  postTweet(tweetBuilder.createSimpleMsg(to, message.NOT_FOUND));
+};
+
+var sendTweetMovieList = function(to, matches) {
+  cinema
+    .getMovies(matches.theater)
+    .then(utils.partial(tweetMoviesFromCinema, to));
+};
+
+var sendTweetMovieTimes = function(to, matches) {
+  schedule.getOne(matches)
+    .then(utils.partial(tweetMovieTimes, to));
 };
 
 var chooseResponse = function(to, matches) {
   if (!matches.movie && !matches.theater) {
-    postTweet(tweetBuilder.createSimpleMsg(to, message.NOT_FOUND));
+    sendTweetNotMatches(to);
   } else if (!matches.movie && matches.theater) {
-    cinema
-      .getMovies(matches.theater)
-      .then(utils.partial(tweetMoviesFromCinema, to));
+    sendTweetMovieList(to, matches);
   } if (matches.movie && matches.theater) {
-    schedule.getOne(matches)
-      .then(utils.partial(tweetMovieTimes, to));
+    sendTweetMovieTimes(to, matches);
   }
 };
 
