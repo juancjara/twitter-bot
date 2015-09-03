@@ -122,7 +122,7 @@ var tweetMoviesFromCinema = function(to, cinema) {
 };
 
 var messages = {
-  NOT_FOUND: 'Not found, this is how u do it';
+  NOT_FOUND: 'Not found, this is how u do it'
 };
 
 var noMatches = function(matches) {
