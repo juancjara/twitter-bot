@@ -181,7 +181,7 @@ var config = require('../config');
 mongoose.connect(config.mongoConnection);
 
 handleMessage({screen_name: 'ggas', text: '#c basadre #m magallanes'});
-
+*/
 module.exports = listenStream;
 listenStream.listenStream = listenStream;
-*/
+
