@@ -180,6 +180,10 @@ var postTweet = function(message) {
     }
   )
 };
+
+module.exports = listenStream;
+listenStream.listenStream = listenStream;
+
 /*
 var mongoose = require('mongoose');
 var config = require('../config');
@@ -187,7 +191,5 @@ var config = require('../config');
 mongoose.connect(config.mongoConnection);
 
 handleMessage({screen_name: 'ggas', text: '#c cinemark #m Magallanes'});
-
-module.exports = listenStream;
-listenStream.listenStream = listenStream;
 */
+
