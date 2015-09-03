@@ -1,3 +1,7 @@
+var generateUniqueField = function() {
+  return '*' + (new Date()).getMilliseconds();
+};
+
 var getField = function(tweet, path, def) {
   var paths = path.split('.');
   var field = JSON.parse(JSON.stringify(tweet));
@@ -81,5 +85,6 @@ module.exports = {
   argsToArray: argsToArray,
   partial: partial,
   cleanText: cleanText,
-  cleanSpaces: cleanSpaces
+  cleanSpaces: cleanSpaces,
+  generateUniqueField: generateUniqueField
 };
