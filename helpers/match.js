@@ -44,11 +44,11 @@ var lcs = function(str1, str2) {
 var getType = function(text, item) {
   var length = item.simpleName.length;
   var lengthMatch = lcs(item.simpleName, text);
-  return obj = {
+  return {
     rank: (lengthMatch*100.0)/length,
     _id: item._id,
     name: item.realName
-  }
+  };
 };
 
 var getId = function(words, list) {
@@ -85,6 +85,53 @@ var getMovieFromCinema = function(text, id) {
   })
 };
 
+var calculateRank = function(words, item) {
+  //todo change split item
+  var wordsToCompare = item.realName.split(' ');
+  var rank = 0;
+  for (var i = 0, len = words.length; i < len; i++) {
+    for (var j = 0, len2 = wordsToCompare.length; j < len2; j++) {
+      if (words[i] === wordsToCompare[j]) {
+        rank++;
+        break;
+      }
+    }
+  }
+
+  return {
+    rank: rank / len2,
+    _id: item._id,
+    name: item.realName
+  }
+};
+
+var getBestMatch = function(text, list) {
+  //todo clean text before split
+  var words = text.split(' ');
+  var matches = list
+    .map(utils.partial(calculateRank, words))
+    .filter(function(item) {
+      return item.rank > 0;
+    })
+    .sort(sortDescByRank);
+  return matches.length > 0 ? matches[0]._id: null;
+};
+
+var getSomething = function(text, model) {
+  return Q.promise(function(resolve, reject) {
+    if (!text || !text.length) {
+      return resolve(null);
+    }
+    model.getList(function(err, list) {
+      if (err) return reject(err);
+      if (!list || !list.length) {
+        return reject('no list found');
+      }
+      resolve(getBestMatch(text, list));
+    })
+  })
+};
+
 var getMovie = function(text) {
   return getTypeFromPromise(text, models.movie);
 };
@@ -112,6 +159,15 @@ var parseQueryFromTweet = function(text) {
   })
 };
 
+var getMovieMatch = function(text) {
+  console.log(text);
+  return getSomething(text, models.movie);
+};
+
+var getCinemaMatch = function(text) {
+  return getSomething(text, models.theater);
+};
+
 var findMovieTimes = function(fields) {
   return Q.promise(function(resolve, reject) {
     getCinema(fields.cinema).then(function(cinemaId) {
@@ -136,6 +192,12 @@ var data = {
   movie: 'intocables'
 };
 
+getMovieMatch('Magallanes')
+  .then(function(res) {
+    console.log(res);
+  })
+*/
+/*
 findMovieTimes(data)
   .then(models.schedule.getOne)
   .then(function(gg){
@@ -153,5 +215,7 @@ module.exports = {
   getMovie: getMovie,
   getCinema: getCinema,
   getQuery: getQuery,
-  findMovieTimes: findMovieTimes
+  findMovieTimes: findMovieTimes,
+  getMovieMatch: getMovieMatch,
+  getCinemaMatch: getCinemaMatch
 }

@@ -1,4 +1,4 @@
-var Q = require('q');
+var Q = require('q')
 var Twit = require('twit');
 
 var cinema = require('../models/theater');
@@ -125,12 +125,8 @@ var messages = {
   NOT_FOUND: 'Not found, this is how u do it'
 };
 
-var noMatches = function(matches) {
-  return !matches.movie && !matches.theater;
-};
-
-var sendTweetNotMatches = function(to) {
-  postTweet(tweetBuilder.createSimpleMsg(to, message.NOT_FOUND));
+var sendTweetNoMatches = function(to) {
+  postTweet(tweetBuilder.createSimpleMsg(to, messages.NOT_FOUND));
 };
 
 var sendTweetMovieList = function(to, matches) {
@@ -144,20 +140,28 @@ var sendTweetMovieTimes = function(to, matches) {
     .then(utils.partial(tweetMovieTimes, to));
 };
 
-var chooseResponse = function(to, matches) {
+var chooseResponse = function(to, movieId, cinemaId) {
+  console.log(movieId, cinemaId);
+  var matches = {
+    movie: movieId,
+    theater: cinemaId
+  };
   if (!matches.movie && !matches.theater) {
-    sendTweetNotMatches(to);
+    sendTweetNoMatches(to);
   } else if (!matches.movie && matches.theater) {
     sendTweetMovieList(to, matches);
-  } if (matches.movie && matches.theater) {
+  } else if (matches.movie && matches.theater) {
     sendTweetMovieTimes(to, matches);
+  } else {
+    sendTweetNoMatches(to);
   }
 };
 
 var handleMessage = function(tweetFields) {
   var queryFields = extractMovieAndCinema(tweetFields.text);
-  match.findMovieTimes(queryFields)
-    .then(utils.partial(chooseResponse, tweetFields.screen_name));
+  Q.spread([match.getMovieMatch(queryFields.movie),
+            match.getCinemaMatch(queryFields.cinema)],
+           utils.partial(chooseResponse, tweetFields.screen_name))
 };
 
 var listenStream = function(hashtag) {
@@ -180,8 +184,8 @@ var config = require('../config');
 
 mongoose.connect(config.mongoConnection);
 
-handleMessage({screen_name: 'ggas', text: '#c basadre #m magallanes'});
-*/
+handleMessage({screen_name: 'ggas', text: '#c cinemark #m Magallanes'});
+
 module.exports = listenStream;
 listenStream.listenStream = listenStream;
-
+*/
