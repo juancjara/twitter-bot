@@ -66,12 +66,12 @@ var createTweets = function(fields, templates) {
 
 var templates = {
   times: {
-    singleTweet: '@{to} pelicula:{movie} cine:{cinema} -> {msg} ' +
+    singleTweet: '@{to} pelicula: {movie} cine: {cinema} -> {msg} ' +
       '{uniqueField}',
     multipleTweets: 'pelicula: {movie} cine: {cinema} -> {msg}'
   },
   movieList: {
-    singleTweet: '@{to} cine:{cinema} -> {msg}',
+    singleTweet: '@{to} cine:{cinema} -> {msg} {uniqueField}',
     multipleTweets: 'cine: {cinema} -> {msg}'
   }
 };
@@ -81,7 +81,7 @@ var createPosts = function(to, queryInfo) {
     to: to,
     msg: queryInfo.schedule,
     movie: queryInfo.movie,
-    cinema: queryInfo.theater
+    cinema: queryInfo.cinema
   };
   return createTweets(fields, templates.times);
 };
