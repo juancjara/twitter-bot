@@ -102,10 +102,9 @@ var extractMovieAndCinema = function(text) {
 };
 
 var tweetMovieTimes = function(to, timeInfo) {
-  var posts = tweetBuilder.createPosts(to, timeInfo);
-  posts.forEach(function(post) {
-    postTweet(post);
-  })
+  tweetBuilder
+    .createPosts(to, timeInfo)
+    .forEach(postTweet);
 };
 
 var tweetMoviesFromCinema = function(to, cinema) {
@@ -117,7 +116,9 @@ var tweetMoviesFromCinema = function(to, cinema) {
       })
       .join(' ,')
   };
-  //var post = tweetBuilder.moviesPost(to, fields)
+  tweetBuilder
+    .moviesPost(to, fields)
+    .forEach(postTweet);
 };
 
 var messages = {
@@ -133,7 +134,7 @@ var chooseResponse = function(to, matches) {
       .then(utils.partial(tweetMoviesFromCinema, to));
   } if (matches.movie && matches.theater) {
     schedule.getOne(matches)
-      .then(utils.partial(tweetMovieTime, to));
+      .then(utils.partial(tweetMovieTimes, to));
   }
 };
 
@@ -157,14 +158,14 @@ var postTweet = function(message) {
     }
   )
 };
-
+/*
 var mongoose = require('mongoose');
 var config = require('../config');
 
 mongoose.connect(config.mongoConnection);
 
-handleMessage({screen_name: 'ggas', text: '#c asdf 123 awer'});
+handleMessage({screen_name: 'ggas', text: '#c basadre #m magallanes'});
 
 module.exports = listenStream;
 listenStream.listenStream = listenStream;
-
+*/

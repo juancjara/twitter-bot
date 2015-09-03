@@ -73,6 +73,7 @@ scheduleSchema.statics.getOne = function(params) {
           movie: movie.realName,
           cinema: theater.realName
         }
+        console.log('rsponse', response);
         return resolve(response);
       })
     })

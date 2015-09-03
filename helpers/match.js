@@ -71,15 +71,12 @@ var getTypeFromPromise = function(text, model) {
 };
 
 var getMovieFromCinema = function(text, id) {
-  console.log(text, id);
   return Q.promise(function(resolve, reject) {
     if (!text || !text.length)
       return resolve(null);
-    console.log('asdf');
     cinema
       .getMovies(id)
       .then(function(theater) {
-        console.log('here', theater);
         if (!theater.movies || !theater.movies.length) {
           reject('no list found');
         }
