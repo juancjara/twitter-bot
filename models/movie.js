@@ -41,6 +41,4 @@ movieSchema.statics.findOrCreate = function(params) {
   });
 }
 
-movieSchema.statics
-
 var Movie = module.exports = mongoose.model('Movie', movieSchema);

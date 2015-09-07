@@ -97,6 +97,27 @@ var scrapUrl = function(url, fn) {
 
 var cinePlazaJesusMaria = function() {
 
+  var removeDuplicateMovies = function(movies) {
+    var dic = {};
+
+    movies.forEach(function(movie) {
+      if (movie.name in dic) {
+        dic[movie.name].times += ' ' + movie.times;
+      } else {
+        dic[movie.name] = {
+          name: movie.name,
+          times: movie.times
+        }
+      }
+    })
+
+    var arr = [];
+    Object.keys(dic).forEach(function(k) {
+      arr.push(dic[k]);
+    })
+    return arr;
+  };
+
   var extractMovieTimes = function(urlMovie) {
     return Q.promise(function(resolve, reject) {
       scrapUrl(urlMovie, function(dom) {
@@ -157,8 +178,9 @@ var cinePlazaJesusMaria = function() {
         var tasks = moviesUrl.map(function(url) {
           return extractMovieTimes(baseUrl + url);
         });
-
-        Q.all(tasks).done(resolve);
+        Q.all(tasks).then(function(movies) {
+          resolve(removeDuplicateMovies(movies));
+        });
       })
     })
   };
@@ -168,3 +190,4 @@ var cinePlazaJesusMaria = function() {
 
 module.exports = scrap;
 scrap.scrap = scrap;
+scrap.scrapJesusMaria = cinePlazaJesusMaria.scrap;

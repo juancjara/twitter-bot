@@ -175,7 +175,6 @@ var listenStream = function(hashtag) {
 };
 
 var postTweet = function(message) {
-  return console.log(message);
   T.post('statuses/update', {status: message},
     function(err, data, response) {
       if (err) return console.log(err);
