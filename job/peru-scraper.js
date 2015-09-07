@@ -1,8 +1,10 @@
 'user strict';
 
+var Q = require('q');
 var cheerio = require('cheerio');
 var format = require('string-template');
 var request = require('request');
+
 var utils = require('../helpers/utils');
 
 var getSchedule = function(text) {
@@ -16,7 +18,7 @@ var orderTimes = function(a , b) {
 
 var formatSchedule = function formatSchedule(schedules) {
   var dic = {};
-  
+
   schedules.forEach(function(item) {
     if (!(item.types in dic)) {
       dic[item.types] = {
@@ -30,7 +32,7 @@ var formatSchedule = function formatSchedule(schedules) {
   var template = '[{0}] {1}';
   var arrSchedule = utils.dicToArray(dic);
   return arrSchedule.map(function(item) {
-    return format(template, item.types, item.times.sort(orderTimes).join(' '));    
+    return format(template, item.types, item.times.sort(orderTimes).join(' '));
   }).join(' ');
 
 };
@@ -67,7 +69,7 @@ var getCinemas = function getCinemas($theathers) {
       movies: getMovies($(this).find('tbody tr'))
     });
   })
-  
+
   return cinemas;
 };
 
@@ -83,6 +85,86 @@ var scrap = function scrap(url, cb) {
     cb(null, loadCheerio(html));
   });
 };
+
+//cineplaza jesus maria
+
+var scrapUrl = function(url, fn) {
+  request(url, function(err, res, html) {
+    if (err) return console.log(err);
+    fn(cheerio.load(html));
+  })
+};
+
+var cinePlazaJesusMaria = function() {
+
+  var extractMovieTimes = function(urlMovie) {
+    return Q.promise(function(resolve, reject) {
+      scrapUrl(urlMovie, function(dom) {
+        var $ = dom;
+        var times = [];
+
+        $('tr').slice(1).each(function() {
+          times = times.concat($(this).children().slice(1)
+                               .text()
+                               .replace(/[A-Z]*/g, '')
+                               .replace(/\s+/g, ' ')
+                               .trim()
+                               .split(' '));
+        })
+
+          var title = $('h1').text();
+        var timesWithType = parseMovieType(title) + ' ' + times.sort(orderTimes).join(' ');
+        var obj = {
+          name: parseMovieName(title),
+          times: timesWithType
+        };
+        resolve(obj);
+      })
+    })
+  };
+
+  var parseMovieName = function(text) {
+    return text.split(' ').slice(0, -1).join(' ');
+  };
+
+  var parseMovieType = function(text) {
+    var types = text.split(' ').slice(-1)[0].split('-');
+    var language = types[1] === 'DOBLADA'? 'Dob': 'Sub';
+    return '[' + types[0].replace('2D', '') + language + ']';
+  };
+
+  var extractUrlMovies = function(dom) {
+    var urls = [];
+
+    var $ = dom;
+    $('#jumpMenu').first().children()
+      .each(function() {
+        urls.push($(this).val());
+      });
+
+    return urls
+      .filter(function(url) {
+        return url !== undefined;
+      });
+  };
+
+  var scrap = function() {
+    return Q.promise(function(resolve) {
+      var baseUrl = 'http://www.multicinesplazajesusmaria.com/';
+
+      scrapUrl(baseUrl, function(dom) {
+        var moviesUrl = extractUrlMovies(dom);
+        var tasks = moviesUrl.map(function(url) {
+          return extractMovieTimes(baseUrl + url);
+        });
+
+        Q.all(tasks).done(resolve);
+      })
+    })
+  };
+
+  return {scrap: scrap};
+}();
 
 module.exports = scrap;
 scrap.scrap = scrap;
