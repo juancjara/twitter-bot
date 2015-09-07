@@ -193,5 +193,5 @@ var config = require('../config');
 
 mongoose.connect(config.mongoConnection);
 
-handleMessage({screen_name: 'ggas', text: '#c cinemark #p Siniestro'});
+handleMessage({screen_name: 'ggas', text: '#c jockey plaza #p Siniestro'});
 */

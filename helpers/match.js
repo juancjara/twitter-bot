@@ -87,7 +87,7 @@ var getMovieFromCinema = function(text, id) {
 
 var calculateRank = function(words, item) {
   //todo change split item
-  var wordsToCompare = item.realName.split(' ');
+  var wordsToCompare = utils.cleanText(item.realName).split(' ');
   var rank = 0;
   for (var i = 0, len = words.length; i < len; i++) {
     for (var j = 0, len2 = wordsToCompare.length; j < len2; j++) {
@@ -107,7 +107,7 @@ var calculateRank = function(words, item) {
 
 var getBestMatch = function(text, list) {
   //todo clean text before split
-  var words = text.split(' ');
+  var words = utils.cleanText(text).split(' ');
   var matches = list
     .map(utils.partial(calculateRank, words))
     .filter(function(item) {
@@ -123,7 +123,7 @@ var getSomething = function(text, model) {
       return resolve(null);
     }
     model.getList(function(err, list) {
-      if (err) return reject(err);
+      if (err) return reject(console.log(err));
       if (!list || !list.length) {
         return reject('no list found');
       }
@@ -166,7 +166,6 @@ var parseQueryFromTweet = function(fields) {
 };
 
 var getMovieMatch = function(text) {
-  console.log(text);
   return getSomething(text, models.movie);
 };
 
@@ -176,7 +175,8 @@ var getCinemaMatch = function(text) {
 
 var findMovieAndCinema = function(fields) {
   return Q.promise(function(resolve, reject) {
-    getCinema(fields.cinema).then(function(cinemaId) {
+    getCinemaMatch(fields.cinema).then(function(cinemaId) {
+
       getMovieFromCinema(fields.movie, cinemaId)
         .then(function(movieId) {
           resolve({
