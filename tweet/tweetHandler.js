@@ -142,12 +142,12 @@ var sendTweetMovieTimes = function(to, matches) {
     .then(utils.partial(tweetMovieTimes, to));
 };
 
-var chooseResponse = function(to, movieId, cinemaId) {
-  console.log(movieId, cinemaId);
+var chooseResponse = function(to, matches) {
+  /*console.log(movieId, cinemaId);
   var matches = {
     movie: movieId,
     theater: cinemaId
-  };
+  };*/
   if (!matches.movie && !matches.theater) {
     sendTweetNoMatches(to);
   } else if (!matches.movie && matches.theater) {
@@ -161,9 +161,11 @@ var chooseResponse = function(to, movieId, cinemaId) {
 
 var handleMessage = function(tweetFields) {
   var queryFields = extractMovieAndCinema(tweetFields.text);
-  Q.spread([match.getMovieMatch(queryFields.movie),
+  /*Q.spread([match.getMovieMatch(queryFields.movie),
             match.getCinemaMatch(queryFields.cinema)],
-           utils.partial(chooseResponse, tweetFields.screen_name))
+           utils.partial(chooseResponse, tweetFields.screen_name))*/
+  match.findMovieAndCinema(queryFields)
+    .then(utils.partial(chooseResponse, tweetFields.screen_name))
 };
 
 var listenStream = function(hashtag) {
@@ -173,6 +175,7 @@ var listenStream = function(hashtag) {
 };
 
 var postTweet = function(message) {
+  return console.log(message);
   T.post('statuses/update', {status: message},
     function(err, data, response) {
       if (err) return console.log(err);
@@ -181,15 +184,14 @@ var postTweet = function(message) {
   )
 };
 
+/*
 module.exports = listenStream;
 listenStream.listenStream = listenStream;
 
-/*
 var mongoose = require('mongoose');
 var config = require('../config');
 
 mongoose.connect(config.mongoConnection);
 
-handleMessage({screen_name: 'ggas', text: '#c cinemark #m Magallanes'});
+handleMessage({screen_name: 'ggas', text: '#c cinemark #p Siniestro'});
 */
-

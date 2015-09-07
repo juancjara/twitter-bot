@@ -144,11 +144,17 @@ var getQuery = function(text) {
   return getTypeFromPromise(text, models.query);
 };
 
-var parseQueryFromTweet = function(text) {
-  text =  utils.cleanText(text);
+var parseQueryFromTweet = function(fields) {
+  //text =  utils.cleanText(text);
   return Q.promise(function(resolve, reject) {
-    getCinema(text).then(function(cinemaId) {
-      getMovieFromCinema(text, cinemaId)
+    getCinema(fields.cinema).then(function(cinemaId) {
+      if (!cinemaId) {
+        return resolve({
+          movie: null,
+          theater: null
+        });
+      }
+      getMovieFromCinema(fields.movie, cinemaId)
         .then(function(movieId) {
           resolve({
             movie: movieId,
@@ -168,7 +174,7 @@ var getCinemaMatch = function(text) {
   return getSomething(text, models.theater);
 };
 
-var findMovieTimes = function(fields) {
+var findMovieAndCinema = function(fields) {
   return Q.promise(function(resolve, reject) {
     getCinema(fields.cinema).then(function(cinemaId) {
       getMovieFromCinema(fields.movie, cinemaId)
@@ -197,25 +203,13 @@ getMovieMatch('Magallanes')
     console.log(res);
   })
 */
-/*
-findMovieTimes(data)
-  .then(models.schedule.getOne)
-  .then(function(gg){
-    console.log(gg);
-  });
-*/
-/*
-parseQueryFromTweet('Larcomar climas')
-  .then(function(res) {
-    console.log(res);
-  });
-*/
+
 module.exports = {
   parseQueryFromTweet: parseQueryFromTweet,
   getMovie: getMovie,
   getCinema: getCinema,
   getQuery: getQuery,
-  findMovieTimes: findMovieTimes,
+  findMovieAndCinema: findMovieAndCinema,
   getMovieMatch: getMovieMatch,
   getCinemaMatch: getCinemaMatch
 }
