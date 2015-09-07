@@ -183,10 +183,10 @@ var postTweet = function(message) {
   )
 };
 
-/*
+
 module.exports = listenStream;
 listenStream.listenStream = listenStream;
-
+/*
 var mongoose = require('mongoose');
 var config = require('../config');
 
