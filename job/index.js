@@ -4,8 +4,8 @@ var moment = require('moment');
 var updateData = require('./updateData');
 var cleanData = require('./cleanData');
 //var time = '0 */1 * * * *';
-var twoHours = '0 */2 * * *';
-var sixHours = '0 */6 * * *';
+var crawlerTime = '0 */1 * * *';
+var cleanerTime = '0 */6 * * *';
 //var time = '00 30 3 * * *';
 
 var clean = function() {
@@ -19,12 +19,12 @@ var update = function() {
 };
 
 var cleaner = new CronJob({
-  cronTime: sixHours,
+  cronTime: cleanerTime,
   onTick: clean
 })
 
 var updater = new CronJob({
-  cronTime: twoHours,
+  cronTime: crawlerTime,
   onTick: update
 })
 

@@ -21,12 +21,12 @@ function format(name) {
     realName: name,
     simpleName: utils.cleanText(name),
     updated: Date.now()
-  }
+  };
 };
 
 movieSchema.statics.clean = function(condition) {
   return Movie.remove(condition);
-}
+};
 
 movieSchema.statics.findOrCreate = function(params) {
   var condition = {realName: params.name};
@@ -37,8 +37,8 @@ movieSchema.statics.findOrCreate = function(params) {
       function(err, data) {
         if (err) return reject(err);
         resolve(data);
-      })
+      });
   });
-}
+};
 
 var Movie = module.exports = mongoose.model('Movie', movieSchema);

@@ -10,7 +10,6 @@ module.exports.start = function(cb) {
     updated: {$lt: minDate}
   };
 
-  return;
   schedule.clean(condition)
     .then(function() {
       console.log('schedule clean');
@@ -23,5 +22,5 @@ module.exports.start = function(cb) {
     .then(function() {
       console.log('theater clean');
       if (cb) cb();
-    })
-}
+    });
+};
