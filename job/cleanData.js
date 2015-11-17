@@ -5,7 +5,7 @@ var theater = require('../models/theater');
 
 module.exports.start = function(cb) {
 
-  var minDate = moment().subtract(6, 'hours').toDate();
+  var minDate = moment().subtract(1, 'hours').toDate();
   var condition = {
     updated: {$lt: minDate}
   };
